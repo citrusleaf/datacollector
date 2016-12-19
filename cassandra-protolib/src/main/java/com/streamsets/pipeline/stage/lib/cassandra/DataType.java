@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 StreamSets Inc.
+ * Copyright 2015 StreamSets Inc.
  *
  * Licensed under the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,14 +17,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.streamsets.pipeline.stage.destination.cassandra;
 
-import com.datastax.driver.core.ProtocolVersion;
-import com.streamsets.pipeline.api.base.BaseEnumChooserValues;
+package com.streamsets.pipeline.stage.lib.cassandra;
 
-public class ProtocolVersionChooserValues extends BaseEnumChooserValues {
+import com.streamsets.pipeline.api.GenerateResourceBundle;
+import com.streamsets.pipeline.api.Label;
 
-  public ProtocolVersionChooserValues() {
-    super(ProtocolVersion.class);
+@GenerateResourceBundle
+public enum DataType implements Label {
+  STRING("String"),
+  LIST("List"),
+  HASH("Hash"),
+  SET("Set");
+
+  private String label;
+
+  DataType(String label) {
+    this.label = label;
+  }
+
+  @Override
+  public String getLabel() {
+    return label;
   }
 }
+

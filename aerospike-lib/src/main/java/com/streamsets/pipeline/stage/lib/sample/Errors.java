@@ -17,13 +17,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.streamsets.pipeline.stage.destination.cassandra;
+package com.streamsets.pipeline.stage.destination.lib.sample;
 
-import com.streamsets.pipeline.api.base.BaseEnumChooserValues;
+import com.streamsets.pipeline.api.ErrorCode;
+import com.streamsets.pipeline.api.GenerateResourceBundle;
 
-public class CompressionChooserValues extends BaseEnumChooserValues {
+@GenerateResourceBundle
+public enum Errors implements ErrorCode {
 
-  public CompressionChooserValues() {
-    super(CassandraCompressionCodec.class);
+  INVALID_CONFIGURATION("A configuration is invalid because: {}"),
+  COULD_NOT_CONNECT("Could not connect to Aerospike at {}:{} because: {}"),
+  INVALID_FIELD_MAPPING("Field mapping is not specified: {}"),
+  SAMPLE_01("Sample Error: {}")
+  ;
+  private final String msg;
+
+  Errors(String msg) {
+    this.msg = msg;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getCode() {
+    return name();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getMessage() {
+    return msg;
   }
 }

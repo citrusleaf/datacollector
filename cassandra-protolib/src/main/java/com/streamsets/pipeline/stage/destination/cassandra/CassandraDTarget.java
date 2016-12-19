@@ -21,6 +21,10 @@ package com.streamsets.pipeline.stage.destination.cassandra;
 
 import com.datastax.driver.core.ProtocolVersion;
 import com.streamsets.pipeline.lib.el.VaultEL;
+import com.streamsets.pipeline.stage.lib.cassandra.CassandraCompressionCodec;
+import com.streamsets.pipeline.stage.lib.cassandra.CompressionChooserValues;
+import com.streamsets.pipeline.stage.lib.cassandra.Groups;
+import com.streamsets.pipeline.stage.lib.cassandra.ProtocolVersionChooserValues;
 import com.streamsets.pipeline.api.ConfigDef;
 import com.streamsets.pipeline.api.ConfigGroups;
 import com.streamsets.pipeline.api.GenerateResourceBundle;
