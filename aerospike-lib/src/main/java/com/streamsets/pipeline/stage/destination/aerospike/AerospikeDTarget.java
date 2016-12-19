@@ -32,11 +32,15 @@ import com.streamsets.pipeline.configurablestage.DTarget;
 	    label = "Aerospike",
 	    description = "Writes data to Aerospike",
 	    icon = "aerospike.png",
+<<<<<<< c7b1f805c7c5b2b0d5326b63d7e4a84220bba3a5
 	    	upgrader = AerospikeTargetUpgrader.class,
+=======
+>>>>>>> TET: aerospike dest + cassandra orig
 	    recordsByRef = true,
 	    onlineHelpRefUrl = ""
 	)
 
+<<<<<<< c7b1f805c7c5b2b0d5326b63d7e4a84220bba3a5
 @ConfigGroups(Groups.class)
 @GenerateResourceBundle
 public class AerospikeDTarget extends DTarget{
@@ -49,3 +53,81 @@ public class AerospikeDTarget extends DTarget{
     return new AerospikeTarget(this.conf);
   }
 }
+=======
+	@ConfigGroups(Groups.class)
+	@GenerateResourceBundle
+	public class AerospikeDTarget extends DTarget{
+
+	  @ConfigDefBean(groups = {"DATABASE"})
+	  public AerospikeTargetConfig conf;
+
+	  @Override
+	  protected Target createTarget() {
+	    return new AerospikeTarget(this.conf);
+	  }
+	}
+/*
+@StageDef(
+    version = 1,
+    label = "Aerospike",
+    description = "",
+    icon = "default.png",
+    recordsByRef = true,
+    onlineHelpRefUrl = ""
+)
+@ConfigGroups(value = Groups.class)
+@GenerateResourceBundle
+public class AerospikeDTarget extends AerospikeTarget {
+
+//	@ConfigDef(
+//			required = true,
+//			type = ConfigDef.Type.LIST,
+//			)
+//	public List<String> strings;
+	
+  @ConfigDef(
+      required = true,
+      type = ConfigDef.Type.STRING,
+      defaultValue = "127.0.0.1",
+      label = "Seed Host",
+      description = "Seed node to connect to Aerospike",
+      displayPosition = 10,
+      group = "DATABASE"
+  )
+  public String seedHost;
+
+  @Override
+  public String getSeedHost() {
+    return seedHost;
+  }
+
+  @ConfigDef(
+	      required = true,
+	      type = ConfigDef.Type.NUMBER,
+	      defaultValue = "3000",
+	      label = "Seed Port",
+	      description = "Port on which to connect to Aerospike (default: 3000)",
+	      displayPosition = 20,
+	      group = "DATABASE"
+	  )
+	  public String port;
+
+	  @Override
+	  public int getSeedPort() {
+	    return Integer.parseInt(port);
+	  }
+
+	  @ConfigDef(
+		      required = true,
+		      type = ConfigDef.Type.MODEL,
+		      defaultValue = "",
+		      label = "Fields",
+		      description = "Key names, their values and storage type",
+		      displayPosition = 40,
+		      group = "DATABASE"
+		  )
+		  @ListBeanModel
+		  public List<AerospikeFieldMappingConfig> redisFieldMapping;
+}
+*/
+>>>>>>> TET: aerospike dest + cassandra orig

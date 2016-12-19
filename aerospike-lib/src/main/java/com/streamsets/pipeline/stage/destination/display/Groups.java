@@ -26,8 +26,12 @@ import com.streamsets.pipeline.api.Label;
 public enum Groups implements Label {
   DATABASE("Database"),
   ADVANCED("Advanced"),
+<<<<<<< c7b1f805c7c5b2b0d5326b63d7e4a84220bba3a5
   FIELD_MAPPING("Field Mapping"),
   CREDENTIALS("Credentials")
+=======
+  FIELD_MAPPING("Field Mapping")
+>>>>>>> TET: aerospike dest + cassandra orig
   ;
 
   private final String label;
