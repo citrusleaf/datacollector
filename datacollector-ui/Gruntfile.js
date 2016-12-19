@@ -355,7 +355,7 @@ module.exports = function(grunt) {
       compile_js: {
         options: {
           banner: '<%= meta.banner %>',
-          separator: ';'
+          separator: ';\n'
         },
         src: getCompileJSFiles(),
         dest: '<%= build_dir %>/assets/<%= pkg.name %>-<%= pkg.version %>-<%= buildTime %>.js'
