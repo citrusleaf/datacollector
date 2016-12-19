@@ -24,6 +24,7 @@ import com.streamsets.pipeline.api.Config;
 import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.api.StageUpgrader;
 import com.streamsets.pipeline.api.impl.Utils;
+import com.streamsets.pipeline.stage.lib.cassandra.CassandraCompressionCodec;
 
 import java.util.List;
 

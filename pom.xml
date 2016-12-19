@@ -63,6 +63,7 @@
          for every stage library here with the directory name as value
     -->
 
+    <aerospike-lib>aerospike-lib</aerospike-lib>
     <aws-lib>aws-lib</aws-lib>
     <basic-lib>basic-lib</basic-lib>
     <dev-lib>dev-lib</dev-lib>
@@ -190,6 +191,7 @@
          IMPORTANT: define a property matching the module directory name
          for every stage library here with the directory name as value
     -->
+    <module>aerospike-lib</module>
     <module>aws-lib</module>
     <module>azure-lib</module>
     <module>basic-lib</module>
