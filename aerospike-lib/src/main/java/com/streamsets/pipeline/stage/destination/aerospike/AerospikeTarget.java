@@ -103,6 +103,11 @@ public class AerospikeTarget extends BaseTarget {
 		if (issues.size() == 0) {
 			// Try to connect to the cluster
 			ClientPolicy policy = new ClientPolicy();
+			if(conf.useCredentials){
+				policy.user = conf.username;
+				policy.password = conf.password;
+			}
+			
 			policy.failIfNotConnected = true;
 			policy.timeout = conf.connectionTimeout;
 			try {
