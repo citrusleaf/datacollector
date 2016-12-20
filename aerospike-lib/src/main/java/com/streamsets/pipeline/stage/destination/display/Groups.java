@@ -26,7 +26,8 @@ import com.streamsets.pipeline.api.Label;
 public enum Groups implements Label {
   DATABASE("Database"),
   ADVANCED("Advanced"),
-  FIELD_MAPPING("Field Mapping")
+  FIELD_MAPPING("Field Mapping"),
+  CREDENTIALS("Credentials")
   ;
 
   private final String label;
