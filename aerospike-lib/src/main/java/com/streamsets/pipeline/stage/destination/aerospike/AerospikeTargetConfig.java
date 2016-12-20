@@ -30,6 +30,7 @@ import com.streamsets.pipeline.api.ConfigDef;
 import com.streamsets.pipeline.api.FieldSelectorModel;
 import com.streamsets.pipeline.api.ListBeanModel;
 import com.streamsets.pipeline.api.ValueChooserModel;
+import com.streamsets.pipeline.lib.el.VaultEL;
 
 public class AerospikeTargetConfig {
 
@@ -176,18 +177,7 @@ public class AerospikeTargetConfig {
   
   @ListBeanModel
   public List<AerospikeFieldMappingConfig> aerospikeFieldMapping;
-  
-//  
-// 	@ConfigDef(
-// 		required = true,
-// 		type = ConfigDef.Type.BOOLEAN,
-// 		label = "Use Credentials",
-// 		defaultValue = "false",
-// 		displayPosition = 40,
-// 		group = "DATABASE"
-// 	)
-// 	public boolean useCredentials = false;
-//
+
 
   @ConfigDef(
       required = true,
