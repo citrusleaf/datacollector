@@ -30,10 +30,6 @@ import com.streamsets.pipeline.api.ConfigDef;
 import com.streamsets.pipeline.api.FieldSelectorModel;
 import com.streamsets.pipeline.api.ListBeanModel;
 import com.streamsets.pipeline.api.ValueChooserModel;
-<<<<<<< c7b1f805c7c5b2b0d5326b63d7e4a84220bba3a5
-import com.streamsets.pipeline.lib.el.VaultEL;
-=======
->>>>>>> TET: aerospike dest + cassandra orig
 
 public class AerospikeTargetConfig {
 
@@ -180,9 +176,7 @@ public class AerospikeTargetConfig {
   
   @ListBeanModel
   public List<AerospikeFieldMappingConfig> aerospikeFieldMapping;
-
-<<<<<<< c7b1f805c7c5b2b0d5326b63d7e4a84220bba3a5
-
+  
   @ConfigDef(
       required = true,
       type = ConfigDef.Type.MODEL,
@@ -218,9 +212,5 @@ public class AerospikeTargetConfig {
  		triggeredByValue = {"PLAINTEXT", "DSE_PLAINTEXT"}
  	)
  	public String password;
-=======
-//  @ConfigDefBean(groups = "DATABASE")
-//  public DataGeneratorFormatConfig dataFormatConfig = new DataGeneratorFormatConfig();
->>>>>>> TET: aerospike dest + cassandra orig
 
 }

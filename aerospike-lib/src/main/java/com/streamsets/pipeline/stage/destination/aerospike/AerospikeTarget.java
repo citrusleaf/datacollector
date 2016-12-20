@@ -103,14 +103,12 @@ public class AerospikeTarget extends BaseTarget {
 		if (issues.size() == 0) {
 			// Try to connect to the cluster
 			ClientPolicy policy = new ClientPolicy();
-<<<<<<< c7b1f805c7c5b2b0d5326b63d7e4a84220bba3a5
+
 			if(conf.authProviderOption != AuthProviderOption.NONE){
 				policy.user = conf.username;
 				policy.password = conf.password;
 			}
 			
-=======
->>>>>>> TET: aerospike dest + cassandra orig
 			policy.failIfNotConnected = true;
 			policy.timeout = conf.connectionTimeout;
 			try {
