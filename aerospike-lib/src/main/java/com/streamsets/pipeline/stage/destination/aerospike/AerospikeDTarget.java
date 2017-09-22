@@ -41,7 +41,7 @@ import com.streamsets.pipeline.configurablestage.DTarget;
 @GenerateResourceBundle
 public class AerospikeDTarget extends DTarget{
 
-  @ConfigDefBean
+  @ConfigDefBean//(groups = {"DATABASE"})
   public AerospikeTargetConfig conf;
 
   @Override

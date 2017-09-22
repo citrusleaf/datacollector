@@ -388,18 +388,6 @@
       <outputDirectory>/streamsets-libs/</outputDirectory>
     </fileSet>
 
-    <!-- Aerospike libs -->
-    <fileSet>
-      <directory>${basedir}/../aerospike-lib/target/streamsets-libs/</directory>
-      <outputDirectory>/streamsets-libs/</outputDirectory>
-    </fileSet>
-
-    <!-- Aerospike libs -->
-    <fileSet>
-      <directory>${basedir}/../aerospike-lib/target/streamsets-libs/</directory>
-      <outputDirectory>/streamsets-libs/</outputDirectory>
-    </fileSet>
-
     <!-- AWS libs -->
     <fileSet>
       <directory>${basedir}/../aws-lib/target/streamsets-libs/</directory>
