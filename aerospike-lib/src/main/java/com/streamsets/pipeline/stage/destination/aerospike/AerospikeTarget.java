@@ -103,7 +103,6 @@ public class AerospikeTarget extends BaseTarget {
 		if (issues.size() == 0) {
 			// Try to connect to the cluster
 			ClientPolicy policy = new ClientPolicy();
-
 			if(conf.authProviderOption != AuthProviderOption.NONE){
 				policy.user = conf.username;
 				policy.password = conf.password;

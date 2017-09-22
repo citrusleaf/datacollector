@@ -177,6 +177,18 @@ public class AerospikeTargetConfig {
   @ListBeanModel
   public List<AerospikeFieldMappingConfig> aerospikeFieldMapping;
   
+//  
+// 	@ConfigDef(
+// 		required = true,
+// 		type = ConfigDef.Type.BOOLEAN,
+// 		label = "Use Credentials",
+// 		defaultValue = "false",
+// 		displayPosition = 40,
+// 		group = "DATABASE"
+// 	)
+// 	public boolean useCredentials = false;
+//
+
   @ConfigDef(
       required = true,
       type = ConfigDef.Type.MODEL,
