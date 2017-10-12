@@ -12,11 +12,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.streamsets</groupId>
 	<artifactId>streamsets-datacollector-aerospike-lib</artifactId>
-	<version>2.8.0.0-SNAPSHOT</version>
+	<version>3.0.0.0-SNAPSHOT</version>
 	<parent>
 	    <groupId>com.streamsets</groupId>
 	    <artifactId>streamsets-datacollector-stage-lib-parent</artifactId>
-	    <version>2.8.0.0-SNAPSHOT</version>
+	    <version>3.0.0.0-SNAPSHOT</version>
 	    <relativePath>../stage-lib-parent</relativePath>
 	</parent>
 	<description>StreamSets Data Collector Aerospike Library</description>
@@ -24,7 +24,7 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<streamsets.version>2.8.0.0-SNAPSHOT</streamsets.version>
+		<streamsets.version>3.0.0.0-SNAPSHOT</streamsets.version>
 		<slf4j.version>1.7.7</slf4j.version>
 		<junit.version>4.12</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
