@@ -33,10 +33,10 @@ import com.streamsets.pipeline.lib.jdbc.multithread.TableContext;
 import com.streamsets.pipeline.lib.jdbc.multithread.TableContextUtil;
 import com.streamsets.pipeline.lib.jdbc.multithread.TableJdbcRunnable;
 import com.streamsets.pipeline.lib.jdbc.multithread.TableRuntimeContext;
+import com.streamsets.pipeline.lib.util.OffsetUtil;
 import com.streamsets.pipeline.sdk.DataCollectorServicesUtils;
 import com.streamsets.pipeline.sdk.PushSourceRunner;
 import com.streamsets.pipeline.sdk.RecordCreator;
-import com.streamsets.pipeline.lib.jdbc.multithread.util.OffsetQueryUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -55,10 +55,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 
 public class BasicIT extends BaseTableJdbcSourceIT {
   private static final String STARS_INSERT_TEMPLATE = "INSERT into TEST.%s values (%s, '%s', '%s')";
@@ -809,7 +805,7 @@ public class BasicIT extends BaseTableJdbcSourceIT {
   public void testUpgradeOffsetsToV2FromLegacyFormat() throws Exception {
     Map<String, String> lastOffsets = Maps.newLinkedHashMap(
         Collections.singletonMap(
-            Source.POLL_SOURCE_OFFSET_KEY, OffsetQueryUtil.serializeOffsetMap(
+            Source.POLL_SOURCE_OFFSET_KEY, OffsetUtil.serializeOffsetMap(
                 Maps.newLinkedHashMap(
                     ImmutableMap.of(
                         "TEST.CRICKET_STARS", "P_ID=5",
@@ -845,7 +841,7 @@ public class BasicIT extends BaseTableJdbcSourceIT {
       Assert.assertTrue(lastOffsetStringMap.containsKey(Source.POLL_SOURCE_OFFSET_KEY));
 
       Map<String, String> oldOffsetMap =
-          OffsetQueryUtil.deserializeOffsetMap(lastOffsetStringMap.get(Source.POLL_SOURCE_OFFSET_KEY));
+          OffsetUtil.deserializeOffsetMap(lastOffsetStringMap.get(Source.POLL_SOURCE_OFFSET_KEY));
 
 
       TableJdbcSource source = (TableJdbcSource) invocationOnMock.getMock();

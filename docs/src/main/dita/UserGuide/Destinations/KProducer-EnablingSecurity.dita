@@ -23,8 +23,6 @@
         <p
             conref="../Reusable_Content/Reusable_Topics/Kafka-EnablingSecurity.dita#concept_nrg_5mb_t5/P1"/>
         <p
-            conref="../Reusable_Content/Reusable_Topics/Kafka-EnablingSecurity.dita#concept_nrg_5mb_t5/P2"/>
-        <p
             conref="../Reusable_Content/Reusable_Topics/Kafka-EnablingSecurity.dita#concept_nrg_5mb_t5/P3"
         />
     </conbody>

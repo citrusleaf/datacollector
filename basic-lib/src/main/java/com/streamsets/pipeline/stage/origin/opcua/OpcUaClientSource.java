@@ -217,6 +217,7 @@ public class OpcUaClientSource implements PushSource {
     OpcUaClientConfig config = clientConfigBuilder.setEndpoint(endpoint)
         .setIdentityProvider(new AnonymousProvider())
         .setRequestTimeout(uint(conf.requestTimeoutMillis))
+        .setSessionTimeout(uint(conf.sessionTimeoutMillis))
         .build();
 
     return new OpcUaClient(config);
@@ -234,6 +235,7 @@ public class OpcUaClientSource implements PushSource {
           break;
         case BROWSE_NODES:
           browseNodes();
+          dispatchReceiverErrors(0);
           return;
       }
       while (!context.isStopped()) {
@@ -265,7 +267,7 @@ public class OpcUaClientSource implements PushSource {
             rootNodeId = new NodeId(conf.rootNamespaceIndex, new ByteString(conf.rootIdentifier.getBytes()));
             break;
         }
-        browseNode(rootNodeId, nodeIds);
+        browseNode(rootNodeId, nodeIds, issues);
         if (nodeIds.isEmpty()) {
           issues.add(
               context.createConfigIssue(
@@ -339,21 +341,29 @@ public class OpcUaClientSource implements PushSource {
         stopwatch = Stopwatch.createStarted();
       } else if (stopwatch.elapsed(TimeUnit.SECONDS) > conf.refreshNodeIdsInterval) {
         try {
-          opcUaClient.disconnect().get();
-          opcUaClient = createClient();
-          opcUaClient.connect().get();
           List<NodeId> newNodeIds = new ArrayList<>();
-          browseNode(rootNodeId, newNodeIds);
+          browseNode(rootNodeId, newNodeIds, new ArrayList<>());
           if (!newNodeIds.isEmpty()) {
             nodeIds = newNodeIds;
           }
         } catch (Exception ex) {
           errorQueue.offer(new StageException(Errors.OPC_UA_08, ex.getMessage(), ex));
+          reConnect();
         } finally {
           stopwatch.reset()
               .start();
         }
       }
+    }
+  }
+
+  private void reConnect() {
+    try {
+      opcUaClient.disconnect().get();
+      opcUaClient = createClient();
+      opcUaClient.connect().get();
+    } catch (Exception ex) {
+      LOG.error(Errors.OPC_UA_02.getMessage(), ex.getMessage(), ex);
     }
   }
 
@@ -365,7 +375,7 @@ public class OpcUaClientSource implements PushSource {
     opcUaClient.readValues(0.0, TimestampsToReturn.Both, nodeIds)
         .thenAccept(values -> {
           try {
-            process(values, System.currentTimeMillis() + "." + counter.getAndIncrement());
+            process(values, System.currentTimeMillis() + "." + counter.getAndIncrement(), null);
           } catch (Exception ex) {
             LOG.error(Errors.OPC_UA_09.getMessage(), ex.getMessage(), ex);
             errorQueue.offer(new StageException(Errors.OPC_UA_09, ex.getMessage(), ex));
@@ -373,6 +383,12 @@ public class OpcUaClientSource implements PushSource {
           if (ThreadUtil.sleep(conf.pollingInterval)) {
             pollForData();
           }
+        })
+        .exceptionally(ex -> {
+          LOG.warn(Errors.OPC_UA_12.getMessage(), ex.getMessage());
+          reConnect();
+          pollForData();
+          return null;
         });
   }
 
@@ -432,14 +448,15 @@ public class OpcUaClientSource implements PushSource {
   private void onSubscriptionValue(UaMonitoredItem item, DataValue value) {
     LOG.debug("subscription value received: item={}, value={}", item.getReadValueId().getNodeId(), value.getValue());
     try {
-      process(ImmutableList.of(value), item.getReadValueId().getNodeId() + "." + counter.getAndIncrement());
+      String fieldName = EscapeUtil.singleQuoteEscape(item.getReadValueId().getNodeId().getIdentifier().toString());
+      process(ImmutableList.of(value), item.getReadValueId().getNodeId() + "." + counter.getAndIncrement(), fieldName);
     } catch (Exception ex) {
       LOG.error(Errors.OPC_UA_09.getMessage(), ex.getMessage(), ex);
       errorQueue.offer(new StageException(Errors.OPC_UA_09, ex.getMessage(), ex));
     }
   }
 
-  private void process(List<DataValue> dataValues, String recordSourceId) {
+  private void process(List<DataValue> dataValues, String recordSourceId, String subscribeFieldName) {
     BatchContext batchContext = context.startBatch();
     Record record = context.createRecord(recordSourceId);
     record.set("/", Field.create(new LinkedHashMap<>()));
@@ -448,13 +465,18 @@ public class OpcUaClientSource implements PushSource {
     dataValues.forEach((dataValue) -> {
       String fieldName;
 
-      if (conf.nodeIdFetchMode.equals(NodeIdFetchMode.BROWSE)) {
-        NodeId nodeId = nodeIds.get(idx[0]++);
-        fieldName = EscapeUtil.singleQuoteEscape(nodeId.getIdentifier().toString());
+      if (conf.readMode.equals(OpcUaReadMode.SUBSCRIBE)) {
+        fieldName = subscribeFieldName;
       } else {
-        NodeIdConfig nodeIdConfig = conf.nodeIdConfigs.get(idx[0]++);
-        fieldName = nodeIdConfig.field;
+        if (conf.nodeIdFetchMode.equals(NodeIdFetchMode.BROWSE)) {
+          NodeId nodeId = nodeIds.get(idx[0]++);
+          fieldName = EscapeUtil.singleQuoteEscape(nodeId.getIdentifier().toString());
+        } else {
+          NodeIdConfig nodeIdConfig = conf.nodeIdConfigs.get(idx[0]++);
+          fieldName = nodeIdConfig.field;
+        }
       }
+
 
       if (!fieldName.startsWith("/")) {
         fieldName = "/" + fieldName;
@@ -768,7 +790,7 @@ public class OpcUaClientSource implements PushSource {
     }
   }
 
-  private void browseNode(NodeId browseRoot, List<NodeId> nodeIdList) {
+  private void browseNode(NodeId browseRoot, List<NodeId> nodeIdList, List<ConfigIssue> issues) {
     BrowseDescription browse = new BrowseDescription(
         browseRoot,
         BrowseDirection.Forward,
@@ -790,12 +812,20 @@ public class OpcUaClientSource implements PushSource {
         }
 
         rd.getNodeId().local().ifPresent(nodeId -> {
-          browseNode(nodeId, nodeIdList);
+          browseNode(nodeId, nodeIdList, issues);
         });
       }
     } catch (InterruptedException | ExecutionException ex) {
-      LOG.error("Browsing nodeId={} failed: {}", this.nodeIds.get(0), ex.getMessage(), ex);
+      LOG.error("Browsing nodeId={} failed: {}", browseRoot, ex.getMessage(), ex);
       errorQueue.offer(new StageException(Errors.OPC_UA_08, ex.getMessage(), ex));
+      issues.add(
+          context.createConfigIssue(
+              Groups.NODE_IDS.name(),
+              "conf.rootIdentifier",
+              Errors.OPC_UA_08,
+              ex.getMessage()
+          )
+      );
     }
   }
 

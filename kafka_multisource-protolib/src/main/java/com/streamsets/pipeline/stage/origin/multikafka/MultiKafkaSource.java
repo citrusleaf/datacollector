@@ -15,10 +15,10 @@
  */
 package com.streamsets.pipeline.stage.origin.multikafka;
 
+import com.google.common.base.Throwables;
 import com.streamsets.pipeline.api.BatchContext;
 import com.streamsets.pipeline.api.Field;
 import com.streamsets.pipeline.api.Record;
-import com.streamsets.pipeline.api.Source;
 import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.api.base.BasePushSource;
 import com.streamsets.pipeline.api.base.OnRecordErrorException;
@@ -32,6 +32,7 @@ import com.streamsets.pipeline.lib.parser.DataParserFactory;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.HeaderAttributeConstants;
+import com.streamsets.pipeline.stage.origin.multikafka.loader.KafkaConsumerLoader;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -40,7 +41,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -62,24 +62,24 @@ public class MultiKafkaSource extends BasePushSource {
   private AtomicBoolean shutdownCalled = new AtomicBoolean(false);
   private int batchSize;
 
-  private MultiKafkaConsumerFactory consumerFactory;
-  private ErrorRecordHandler errorRecordHandler;
   private DataParserFactory parserFactory;
   private ExecutorService executor;
 
   public MultiKafkaSource(MultiKafkaBeanConfig conf) {
     this.conf = conf;
     batchSize = conf.maxBatchSize;
-    consumerFactory = new MultiKafkaConsumerFactory();
   }
 
   public class MultiTopicCallable implements Callable<Long> {
-    private KafkaConsumer<String, byte[]> consumer;
+    private MultiSdcKafkaConsumer<String, byte[]> consumer;
     private final long threadID;
-    private final Collection<String> topicList;
+    private final List<String> topicList;
     private final CountDownLatch startProcessingGate;
 
-    public MultiTopicCallable(long threadID, Collection<String> topicList, KafkaConsumer<String, byte[]> consumer,
+    public MultiTopicCallable(
+        long threadID,
+        List<String> topicList,
+        MultiSdcKafkaConsumer<String, byte[]> consumer,
         CountDownLatch startProcessingGate
     ) {
       Thread.currentThread().setName("kafkaConsumerThread-"+threadID);
@@ -105,11 +105,13 @@ public class MultiKafkaSource extends BasePushSource {
         // only 2 conditions that we want to halt execution. must handle gracefully
         while(!getContext().isStopped() && !Thread.interrupted()) {
           BatchContext batchContext = getContext().startBatch();
+          ErrorRecordHandler errorRecordHandler = new DefaultErrorRecordHandler(getContext(), batchContext);
 
           ConsumerRecords<String, byte[]> messages = consumer.poll(conf.batchWaitTime);
           if(!messages.isEmpty()) {
             for(ConsumerRecord<String, byte[]> message : messages) {
               createRecord(
+                  errorRecordHandler,
                   message.topic(),
                   message.partition(),
                   message.offset(),
@@ -134,7 +136,13 @@ public class MultiKafkaSource extends BasePushSource {
       return messagesProcessed;
     }
 
-    private List<Record> createRecord(String topic, int partition, long offset, byte[] payload) throws StageException {
+    private List<Record> createRecord(
+      ErrorRecordHandler errorRecordHandler,
+      String topic,
+      int partition,
+      long offset,
+      byte[] payload
+    ) throws StageException {
       String messageId = getMessageId(topic, partition, offset);
       List<Record> records = new ArrayList<>();
       try(DataParser parser = Utils.checkNotNull(parserFactory, "Initialization failed").getParser(messageId, payload)) {
@@ -184,7 +192,6 @@ public class MultiKafkaSource extends BasePushSource {
   @Override
   public List<ConfigIssue> init() {
     List<ConfigIssue> issues = super.init();
-    errorRecordHandler = new DefaultErrorRecordHandler((Source.Context)getContext());
 
     conf.init(getContext(), issues);
 
@@ -235,7 +242,7 @@ public class MultiKafkaSource extends BasePushSource {
       try {
         futures.add(executor.submit(new MultiTopicCallable(i,
             conf.topicList,
-            consumerFactory.create(getKafkaProperties()),
+            KafkaConsumerLoader.createConsumer(getKafkaProperties()),
             startProcessingGate
         )));
       } catch (Exception e) {
@@ -254,9 +261,10 @@ public class MultiKafkaSource extends BasePushSource {
         shutdown();
         Thread.currentThread().interrupt();
       } catch (ExecutionException e) {
-        LOG.info("Multi kafka thread halted unexpectedly: {}", future, e.getCause().getMessage());
+        LOG.info("Multi kafka thread halted unexpectedly: {}", future, e.getCause().getMessage(), e);
         shutdown();
-        throw (StageException) e.getCause();
+        Throwables.propagateIfPossible(e.getCause(), StageException.class);
+        Throwables.propagate(e.getCause());
       }
     }
 
@@ -282,10 +290,6 @@ public class MultiKafkaSource extends BasePushSource {
 
   private String getMessageId(String topic, int partition, long offset) {
     return topic + "::" + partition + "::" + offset;
-  }
-
-  public void setKafkaConsumerFactory(MultiKafkaConsumerFactory consumerFactory) {
-    this.consumerFactory = consumerFactory;
   }
 
   public void await() throws InterruptedException {

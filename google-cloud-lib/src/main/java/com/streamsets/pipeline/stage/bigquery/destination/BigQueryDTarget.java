@@ -17,18 +17,18 @@ package com.streamsets.pipeline.stage.bigquery.destination;
 
 import com.streamsets.pipeline.api.ConfigDefBean;
 import com.streamsets.pipeline.api.ConfigGroups;
-import com.streamsets.pipeline.api.ExecutionMode;
 import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.api.Target;
 import com.streamsets.pipeline.configurablestage.DTarget;
 import com.streamsets.pipeline.stage.bigquery.lib.Groups;
 
 @StageDef(
-    version = 1,
+    version = 2,
     label = "Google BigQuery",
-    description = "Executes a streaming insert to Google Big Query",
+    description = "Streams data into Google Big Query",
     icon="bigquery.png",
-    producesEvents = true,
+    producesEvents = false,
+    upgrader = BigQueryTargetUpgrader.class,
     onlineHelpRefUrl = "index.html#Destinations/BigQuery.html#task_gxn_dsk_dbb"
 )
 @ConfigGroups(Groups.class)

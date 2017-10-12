@@ -21,7 +21,6 @@ import com.streamsets.pipeline.api.Stage;
 import com.streamsets.pipeline.api.ValueChooserModel;
 import com.streamsets.pipeline.config.DataFormat;
 import com.streamsets.pipeline.stage.origin.lib.DataParserFormatConfig;
-import com.streamsets.pipeline.stage.origin.lib.MessageConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +50,7 @@ public class MultiKafkaBeanConfig {
       displayPosition = 10,
       group = "KAFKA"
   )
-  public String brokerURI;
+  public String brokerURI = "localhost:9092";
 
   @ConfigDef(
       required = true,

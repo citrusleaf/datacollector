@@ -278,9 +278,32 @@ public class HttpClientSource extends BaseSource {
    */
   private void configureAuthAndBuildClient(ClientBuilder clientBuilder, List<ConfigIssue> issues) {
     if (conf.client.authType == AuthenticationType.OAUTH) {
-      authToken = JerseyClientUtil.configureOAuth1(conf.client.oauth, clientBuilder);
-    } else if (conf.client.authType != AuthenticationType.NONE) {
-      JerseyClientUtil.configurePasswordAuth(conf.client.authType, conf.client.basicAuth, clientBuilder);
+      String consumerKey = conf.client.oauth.resolveConsumerKey(getContext(),"CREDENTIALS", "conf.clinet.oauth.", issues);
+      String consumerSecret = conf.client.oauth.resolveConsumerKey(getContext(), "CREDENTIALS", "conf.client.oauth.", issues);
+      String token = conf.client.oauth.resolveToken(getContext(), "CREDENTIALS", "conf.client.oauth.", issues);
+      String tokenSecret = conf.client.oauth.resolveTokenSecret(getContext(), "CREDENTIALS", "conf.client.oauth.", issues);
+
+      if(issues.isEmpty()) {
+        authToken = JerseyClientUtil.configureOAuth1(
+          consumerKey,
+          consumerSecret,
+          token,
+          tokenSecret,
+          clientBuilder
+        );
+      }
+    } else if (conf.client.authType.isOneOf(AuthenticationType.DIGEST, AuthenticationType.BASIC, AuthenticationType.UNIVERSAL)) {
+      String username = conf.client.basicAuth.resolveUsername(getContext(),"CREDENTIALS", "conf.client.basicAuth.", issues);
+      String passowrd = conf.client.basicAuth.resolvePassword(getContext(),"CREDENTIALS", "conf.client.basicAuth.", issues);
+
+      if(issues.isEmpty()) {
+        JerseyClientUtil.configurePasswordAuth(
+          conf.client.authType,
+          username,
+          passowrd,
+          clientBuilder
+        );
+      }
     }
     client = clientBuilder.build();
     if (conf.client.useOAuth2) {

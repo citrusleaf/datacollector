@@ -17,10 +17,8 @@ package com.streamsets.pipeline.lib.http;
 
 import com.google.common.collect.ImmutableList;
 import com.streamsets.pipeline.api.Config;
-import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.lib.tls.TlsConfigBean;
 import org.apache.commons.lang3.StringUtils;
-import org.glassfish.jersey.SslConfigurator;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -48,26 +46,33 @@ public class JerseyClientUtil {
 
   public static void configurePasswordAuth(
       AuthenticationType authType,
-      PasswordAuthConfigBean conf,
+      String username,
+      String password,
       ClientBuilder clientBuilder
   ) {
     if (authType == AuthenticationType.BASIC) {
-      clientBuilder.register(HttpAuthenticationFeature.basic(conf.username, conf.password));
+      clientBuilder.register(HttpAuthenticationFeature.basic(username, password));
     }
 
     if (authType == AuthenticationType.DIGEST) {
-      clientBuilder.register(HttpAuthenticationFeature.digest(conf.username, conf.password));
+      clientBuilder.register(HttpAuthenticationFeature.digest(username, password));
     }
 
     if (authType == AuthenticationType.UNIVERSAL) {
-      clientBuilder.register(HttpAuthenticationFeature.universal(conf.username, conf.password));
+      clientBuilder.register(HttpAuthenticationFeature.universal(username, password));
     }
   }
 
-  public static AccessToken configureOAuth1(OAuthConfigBean conf, ClientBuilder clientBuilder) {
-    ConsumerCredentials consumerCredentials = new ConsumerCredentials(conf.consumerKey, conf.consumerSecret);
+  public static AccessToken configureOAuth1(
+    String consumerKey,
+    String consumerSecret,
+    String token,
+    String tokenSecret,
+    ClientBuilder clientBuilder
+  ) {
+    ConsumerCredentials consumerCredentials = new ConsumerCredentials(consumerKey, consumerSecret);
 
-    AccessToken accessToken = new AccessToken(conf.token, conf.tokenSecret);
+    AccessToken accessToken = new AccessToken(token, tokenSecret);
     Feature feature = OAuth1ClientSupport.builder(consumerCredentials)
         .feature()
         .accessToken(accessToken)

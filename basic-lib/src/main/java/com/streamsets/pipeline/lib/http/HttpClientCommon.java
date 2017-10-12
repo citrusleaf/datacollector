@@ -165,9 +165,32 @@ public class HttpClientCommon {
       Stage.Context context
   ) {
     if (jerseyClientConfig.authType == AuthenticationType.OAUTH) {
-      authToken = JerseyClientUtil.configureOAuth1(jerseyClientConfig.oauth, clientBuilder);
-    } else if (jerseyClientConfig.authType != AuthenticationType.NONE) {
-      JerseyClientUtil.configurePasswordAuth(jerseyClientConfig.authType, jerseyClientConfig.basicAuth, clientBuilder);
+      String consumerKey = jerseyClientConfig.oauth.resolveConsumerKey(context,"CREDENTIALS", "conf.oauth.", issues);
+      String consumerSecret = jerseyClientConfig.oauth.resolveConsumerKey(context, "CREDENTIALS", "conf.oauth.", issues);
+      String token = jerseyClientConfig.oauth.resolveToken(context, "CREDENTIALS", "conf.oauth.", issues);
+      String tokenSecret = jerseyClientConfig.oauth.resolveTokenSecret(context, "CREDENTIALS", "conf.oauth.", issues);
+
+      if(issues.isEmpty()) {
+        authToken = JerseyClientUtil.configureOAuth1(
+          consumerKey,
+          consumerSecret,
+          token,
+          tokenSecret,
+          clientBuilder
+        );
+      }
+    } else if (jerseyClientConfig.authType.isOneOf(AuthenticationType.DIGEST, AuthenticationType.BASIC, AuthenticationType.UNIVERSAL)) {
+      String username = jerseyClientConfig.basicAuth.resolveUsername(context,"CREDENTIALS", "conf.basicAuth.", issues);
+      String password = jerseyClientConfig.basicAuth.resolvePassword(context,"CREDENTIALS", "conf.basicAuth.", issues);
+
+      if(issues.isEmpty()) {
+        JerseyClientUtil.configurePasswordAuth(
+          jerseyClientConfig.authType,
+          username,
+          password,
+          clientBuilder
+        );
+      }
     }
     client = clientBuilder.build();
     if (jerseyClientConfig.useOAuth2) {

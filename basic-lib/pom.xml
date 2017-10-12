@@ -23,11 +23,11 @@
   <parent>
     <groupId>com.streamsets</groupId>
     <artifactId>streamsets-datacollector-stage-lib-parent</artifactId>
-    <version>2.8.0.0-SNAPSHOT</version>
+    <version>3.0.0.0-SNAPSHOT</version>
     <relativePath>../stage-lib-parent</relativePath>
   </parent>
   <artifactId>streamsets-datacollector-basic-lib</artifactId>
-  <version>2.8.0.0-SNAPSHOT</version>
+  <version>3.0.0.0-SNAPSHOT</version>
   <description>StreamSets Data Collector Basic Lib</description>
   <name>StreamSets Data Collector Basic Lib</name>
   <packaging>jar</packaging>
@@ -40,7 +40,7 @@
     <guava.version>20.0</guava.version>
     <h2.version>1.4.187</h2.version>
     <joda.version>2.8</joda.version>
-    <milo.version>0.1.3</milo.version>
+    <milo.version>0.1.5</milo.version>
     <xerces.version>2.11.0</xerces.version>
     <jetty.version>9.4.2.v20170220</jetty.version>
     <paho.version>1.0.2</paho.version>

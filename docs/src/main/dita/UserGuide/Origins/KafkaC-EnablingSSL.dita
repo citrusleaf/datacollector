@@ -21,8 +21,8 @@
     <title>Enabling SSL/TLS</title>
     <conbody>
         <p><indexterm>Kafka Consumer origin<indexterm>enabling SSL/TLS
-                security</indexterm></indexterm>Perform the following steps to enable Kafka Consumer
-            to use SSL/TLS to connect to <ph
+                security</indexterm></indexterm>Perform the following steps to enable the Kafka
+            Consumer origin to use SSL/TLS to connect to <ph
                 conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/KafkaSecure"/>.
             You can use the same steps to configure a Kafka Producer. </p>
         <p

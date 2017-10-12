@@ -21,10 +21,8 @@ import com.streamsets.pipeline.lib.parser.net.netflow.BaseNetflowMessage;
 import com.streamsets.pipeline.lib.parser.net.netflow.OutputValuesMode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class NetflowV9Message extends BaseNetflowMessage {
 
@@ -41,6 +39,7 @@ public class NetflowV9Message extends BaseNetflowMessage {
   public static final String FIELD_PACKET_HEADER = "packetHeader";
   public static final String FIELD_RAW_VALUES = "rawValues";
   public static final String FIELD_INTERPRETED_VALUES = "values";
+  public static final String FIELD_FLOW_TEMPLATE_ID = "flowTemplateId";
 
   private OutputValuesMode outputValuesMode;
   private int flowRecordCount = 0;
@@ -52,6 +51,7 @@ public class NetflowV9Message extends BaseNetflowMessage {
   private FlowKind flowKind;
 
   private final List<NetflowV9Field> fields = new ArrayList<>();
+  private int flowTemplateId;
 
   public int getFlowRecordCount() {
     return flowRecordCount;
@@ -131,6 +131,7 @@ public class NetflowV9Message extends BaseNetflowMessage {
     headerFields.put(FIELD_SOURCE_ID, Field.create(getSourceId()));
     headerFields.put(FIELD_SOURCE_ID_RAW, Field.create(getSourceIdBytes()));
     rootMap.put(FIELD_PACKET_HEADER, Field.createListMap(headerFields));
+    rootMap.put(FIELD_FLOW_TEMPLATE_ID, Field.create(getFlowTemplateId()));
 
     switch (outputValuesMode) {
       case RAW_AND_INTERPRETED:
@@ -165,6 +166,14 @@ public class NetflowV9Message extends BaseNetflowMessage {
     if (fields != null) {
       this.fields.addAll(fields);
     }
+  }
+
+  public int getFlowTemplateId() {
+    return flowTemplateId;
+  }
+
+  public void setFlowTemplateId(int flowTemplateId) {
+    this.flowTemplateId = flowTemplateId;
   }
 
   @Override

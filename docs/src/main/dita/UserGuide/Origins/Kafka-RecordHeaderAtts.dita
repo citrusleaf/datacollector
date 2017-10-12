@@ -35,7 +35,7 @@
                 /><ul id="ul_i4q_2qv_jw">
                 <li
                     conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/li-avroSchema"/>
-                <li>offset - The offset in bytes where the record originated.</li>
+                <li>offset - The offset where the record originated.</li>
                 <li>partition - The partition where the record originated.</li>
                 <li>topic - The topic where the record originated.</li>
             </ul></p>

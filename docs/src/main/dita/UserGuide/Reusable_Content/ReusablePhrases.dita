@@ -203,9 +203,9 @@
                         >Kafka version 0.9.0.0 or later</ph></p>
             <draft-comment author="Loretta">Using this in all DC Console topics:</draft-comment>
             <p>
-                  <note id="Note-OptionDispay">Some icons and options might not display in the
-                        console. The items that display are based on the task that you are
-                        performing and roles assigned to your user account. </note>
+                  <note id="Note-OptionDispay">Some icons and options might not display. The items
+                        that display are based on the task that you are performing and roles
+                        assigned to your user account. </note>
             </p>
             <p>
                   <draft-comment author="Loretta">
@@ -339,12 +339,12 @@
                         <li>Delimited</li>
                         <li>JSON</li>
                         <li>Log</li>
-                        <li>Text</li>
                         <li>Protobuf</li>
                         <li>SDC Record <xref
                                     href="../Pipeline_Design/SDCRecordFormat.dita#concept_qkk_mwk_br">
                                     <image href="../Graphics/icon_moreInfo.png" scale="11"
                                           id="image_drz_1nf_qw"/></xref></li>
+                        <li>Text</li>
                         <li>XML</li>
                   </ul>
             </p>
@@ -386,8 +386,8 @@
                   </dl>
             </p>
             <p>
-                  <draft-comment author="Loretta">Avro-Kafka - ONLY FOR KAFKA CONSUMER because of
-                        the Kafka property.</draft-comment>
+                  <draft-comment author="Loretta">Avro-Kafka - ONLY FOR KAFKA CONSUMER and Kafka
+                        Multitopic Consumer because of the Kafka property.</draft-comment>
                   <dl>
                         <dlentry id="OriginDF-AVRO-Kafka">
                               <dt>Avro</dt>
@@ -416,10 +416,10 @@
                                                 Schema Registry by the schema ID embedded in the
                                                 message or by the schema ID or subject specified in
                                                 the stage configuration.<p>You must specify the
-                                                  method that the Kafka Consumer uses to deserialize
-                                                  the message. If the Avro schema ID is embedded in
-                                                  each message, set the key and value deserializers
-                                                  to Confluent on the <uicontrol>Kafka</uicontrol>
+                                                  method that the origin uses to deserialize the
+                                                  message. If the Avro schema ID is embedded in each
+                                                  message, set the key and value deserializers to
+                                                  Confluent on the <uicontrol>Kafka</uicontrol>
                                                   tab.</p></li>
                                     </ul></dd>
                               <dd>Using a schema in the stage configuration or retrieving a schema
@@ -583,15 +583,15 @@
                                           conref="#concept_vhs_5tz_xp/UDP-syslog" id="ul_fj2_3q4_4x">
                                           <li/>
                                     </ul></dd>
-                        </dlentry>
+                        
+                              <dd><ph conref="#concept_vhs_5tz_xp/ph-NetFlowInfo"/></dd></dlentry>
                   </dl>
             </p>
-            <p>
+            
                   <draft-comment author="Loretta"> - from Directory. DLEntries are conrefed by all
                         origins except HTTP Client. <note> Content for JSON, Text, and HTML copied
                               to HTTP Client and altered. When making changes here, check there as
                               well.</note></draft-comment>
-            </p>
             <p>
                   <dl id="ORIGIN-DFormats">
                         <dlentry id="OriginDF-DELIM">
@@ -1174,8 +1174,9 @@ web-0011.log</codeblock></dd>
                         applications after the Hadoop FS, MapR FS, or Amazon S3 destination closes
                         files.</ph></p>
             <p>
-                  <draft-comment author="Loretta">Event Generation topic.  Hadoop FS and MapR FS use
-                        ph and ul. Local FS uses ph and some bullets in the list.</draft-comment>
+                  <draft-comment author="Loretta">Event Generation topic. Hadoop FS uses the whole
+                        ul. Local FS uses ph and some bullets in the list. MapR FS uses all bullets
+                        in the list. Other </draft-comment>
             </p>
             <p><ph id="D-ph-EventGen1">can generate events that you can use in an event stream. When
                         you enable event generation, the destination generates event records each
@@ -1206,6 +1207,25 @@ web-0011.log</codeblock></dd>
                                     />.</p></li>
                   </ul>
             </p>
+            <p>
+                  <draft-comment author="Loretta">Used by most origins that generate no-more-data in
+                        the Event Generation topic.  Including S3, Directory, JDBC multitable, SQL
+                        Server origins. But Salesforce and JDBC Query have their own
+                        versions.</draft-comment>
+            </p>
+            <p>
+                  <ul>
+                        <li id="li-UseCase-PipelineFinisher">With the Pipeline Finisher executor to
+                              stop the pipeline and transition the pipeline to a Finished state when
+                              the origin completes processing available data.<p>When you restart a
+                                    pipeline stopped by the Pipeline Finisher executor, the origin
+                                    continues processing from the last-saved offset unless you reset
+                                    the origin.</p><p>For an example, see <xref
+                                          href="../Event_Handling/CaseStudy-StopPipeline.dita#concept_kff_ykv_lz"
+                                    />.</p></li>
+                  </ul>
+            </p>
+            <p/>
             <p>
                   <draft-comment author="Loretta">Event Generation topic - Used for JDBC Query and
                         Salesforce, JDBC Multitable uses the mini ph.</draft-comment>
@@ -1283,6 +1303,9 @@ web-0011.log</codeblock></dd>
                         <li><xref href="../Origins/MultiTableJDBCConsumer.dita#concept_zp3_wnw_4y"
                                     >JDBC Multitable Consumer</xref> - Reads database data from
                               multiple tables through a JDBC connection.</li>
+                        <li><xref href="../Origins/KafkaMultiConsumer.dita#concept_ccs_fn4_x1b"
+                                    >Kafka Multitopic Consumer</xref> - Reads data from multiple
+                              topics in a Kafka cluster.</li>
                         <li><xref href="../Origins/KinConsumer.dita#concept_anh_4y3_yr">Kinesis
                                     Consumer</xref> - Reads data from a Kinesis cluster.</li>
                         <li><xref href="../Origins/SQLServerCDC.dita#concept_ut3_ywc_v1b">SQL Server
@@ -1323,10 +1346,12 @@ web-0011.log</codeblock></dd>
                         HTTP Server > Multithreaded Processing and JDBC Multitable Consumer >
                         Multithreaded Processing</draft-comment>
             </p>
-            <p><ph id="HTTPServer-process-ph">the origin creates five threads, and by default <ph
-                              conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
-                        /> creates a matching number of pipeline runners. Upon receiving data, the
-                        origin passes a batch to each of the pipeline runners for processing.
+            <p><ph id="HTTPServer-process-ph"><ph id="ph-createsthreads">the origin creates five
+                              threads, and by default <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                              /> creates a matching number of pipeline runners.</ph>
+                        <ph id="ph-Passesbatch">Upon receiving data, the origin passes a batch to
+                              each of the pipeline runners for processing.</ph>
                   </ph></p>
             <p id="HTTPServer-process-p">At any given moment, the five pipeline runners can each
                   process a batch, so this multithreaded pipeline processes up to five batches at a
@@ -1414,10 +1439,10 @@ web-0011.log</codeblock></dd>
                   <draft-comment author="Loretta">UDP Source and UDP to Kafka use the following ph
                         and ul:</draft-comment>
             </p>
-            <p><ph id="UDP-messagetypes">can read <xref href="https://collectd.org/" format="html"
-                              scope="external">collectd</xref> messages, Netflow messages from
-                        NetFlow Version 5, and the following types of syslog messages:</ph><ul
-                        id="UDP-syslog">
+            <p><ph id="UDP-messagetypes">can process <xref href="https://collectd.org/"
+                              format="html" scope="external">collectd</xref> messages, <ph
+                              id="ph-NetFlowVersions">NetFlow 5 and NetFlow 9 messages</ph>, and the
+                        following types of syslog messages:</ph><ul id="UDP-syslog">
                         <li>RFC 5424 (<xref href="https://tools.ietf.org/html/rfc5424" format="html"
                                     scope="external"
                               >https://tools.ietf.org/html/rfc5424</xref>)</li>
@@ -1427,6 +1452,12 @@ web-0011.log</codeblock></dd>
                         <li>Non-standard common messages, such as RFC 3339 dates with no version
                               digit</li>
                   </ul></p>
+            <p><ph id="ph-NetFlowInfo">When processing NetFlow messages, the stage generates
+                        different records based on the NetFlow version. When processing NetFlow 9,
+                        the records are generated based on the NetFlow 9 configuration properties.
+                        For more information, see <xref
+                              href="../Data_Formats/NetFlow_Overview.dita#concept_thl_nnr_hbb"
+                        />.</ph></p>
             <p>
                   <draft-comment author="Loretta">UDP to Kafka origin and SDC RPC to Kafka origins
                         use the following text in the Pipeline Configuration topics.
@@ -1677,9 +1708,7 @@ input_stream.read()</codeblock></p>
                                           is used only by Flume. <b>AvroFile</b> used by Hadoop FS,
                                           Local and S3, and other file destinations.
                                                 <b>AvroKafka</b> used by Kafka. <b>AvroMess</b> used
-                                          by Kinesis Producer and other message destinations. When
-                                          making changes to these, add updates to the Flume data
-                                          formats topic when necessary. </draft-comment>
+                                          by Kinesis Producer and other message destinations. </draft-comment>
                               </dd>
                         </dlentry>
                   </dl>
@@ -1717,8 +1746,7 @@ input_stream.read()</codeblock></p>
                                     </ul>
                               </dd>
                               <dd>You can also compress data with an Avro-supported compression
-                                    codec. When using Avro compression, do not use other compression
-                                    available in the destination. </dd>
+                                    codec. </dd>
                         </dlentry>
                   </dl>
                   <draft-comment author="alisontaylor">Avro File</draft-comment>
@@ -1752,10 +1780,11 @@ input_stream.read()</codeblock></p>
                               <dd>The destination includes the schema definition in each file.</dd>
                               <dd>You can compress data with an Avro-supported compression codec.
                                     When using Avro compression, avoid using other compression
-                                    available in the destination. </dd>
+                                    properties in the destination. </dd>
                         </dlentry>
                   </dl>
-                  <draft-comment author="alisontaylor">Avro Kafka</draft-comment>
+                  <draft-comment author="alisontaylor">Avro Kafka – for Kafka only because of the
+                        Kafka producer mention.</draft-comment>
                   <dl>
                         <dlentry id="D-DF-AvroKafka">
                               <dt>Avro</dt>
@@ -1790,13 +1819,12 @@ input_stream.read()</codeblock></p>
                                                 message.</p></li>
                                     </ul>
                               </dd>
-                              <dd>You can compress data with an Avro-supported compression codec.
-                                    When using Avro compression, avoid using other compression
-                                    available in the destination. </dd>
+                              <dd>You can compress data with an Avro-supported compression codec. </dd>
                         </dlentry>
                   </dl>
-                  <draft-comment author="alisontaylor">Avro other message
-                        destinations</draft-comment>
+                  <draft-comment author="alisontaylor">Avro other message destinations. LC: removed
+                        reference to not-using other compression options in the destination because
+                        I didn't see any. Checked all destinations using this. 9/29/2017. </draft-comment>
                   <dl>
                         <dlentry id="D-DF-AvroMess">
                               <dt>Avro</dt>
@@ -1829,8 +1857,8 @@ input_stream.read()</codeblock></p>
                                     </ul>
                               </dd>
                               <dd>You can compress data with an Avro-supported compression codec.
-                                    When using Avro compression, avoid using other compression
-                                    available in the destination. </dd>
+                                    When using Avro compression, avoid using any other compression
+                                    properties in the destination. </dd>
                         </dlentry>
                   </dl>
                   <draft-comment author="Loretta"><b>DESTDataFormat-Binary</b> - the following is
@@ -2974,6 +3002,7 @@ ${YY()}_${MM()}_${DD()}</codeblock>
             </p>
             <p id="p-PFinisher-nomoredataOrigins">The following origins generate no-more-data
                         events:<ul id="ul_l51_mvd_nx">
+                        <li>Amazon S3 origin</li>
                         <li>Directory origin</li>
                         <li>JDBC Query Consumer origin</li>
                         <li>JDBC Multitable Consumer origin</li>

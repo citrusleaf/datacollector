@@ -23,7 +23,7 @@
             conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"/> with
             <ph conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/DPM-short"/>
         from the <ph conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
-        /> console.</shortdesc>
+        /> UI.</shortdesc>
     <taskbody>
         <context>
             <p>
@@ -114,7 +114,7 @@
                 </info>
             </step>
             <step>
-                <cmd>Click <uicontrol>Save</uicontrol>.</cmd>
+                <cmd>Click <uicontrol>Enable DPM</uicontrol>.</cmd>
             </step>
             <step>
                 <cmd>If the <ph

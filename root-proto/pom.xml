@@ -23,11 +23,11 @@
   <parent>
     <groupId>com.streamsets</groupId>
     <artifactId>streamsets-datacollector</artifactId>
-    <version>2.8.0.0-SNAPSHOT</version>
+    <version>3.0.0.0-SNAPSHOT</version>
   </parent>
   <groupId>com.streamsets</groupId>
   <artifactId>streamsets-datacollector-root-proto</artifactId>
-  <version>2.8.0.0-SNAPSHOT</version>
+  <version>3.0.0.0-SNAPSHOT</version>
   <description>StreamSets Data Collector Root Prototype POM</description>
   <name>StreamSets Data Collector Root Prototype POM</name>
   <packaging>pom</packaging>
@@ -211,26 +211,6 @@
     <!-- ALL Maven plugin dependencies -->
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.owasp</groupId>
-          <artifactId>dependency-check-maven</artifactId>
-          <version>1.4.5</version>
-          <configuration>
-            <!-- skip non-bundled jars -->
-            <skipProvidedScope>true</skipProvidedScope>
-            <skipRuntimeScope>true</skipRuntimeScope>
-            <!-- We want HTML for easy viewing, but XML for reporting via SonarQube -->
-            <format>ALL</format>
-            <suppressionFile>${basedir}/../dependency-check-suppression.xml</suppressionFile>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>check</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
@@ -458,7 +438,7 @@
         <plugin>
           <groupId>com.streamsets</groupId>
           <artifactId>streamsets-datacollector-rbgen-maven-plugin</artifactId>
-          <version>2.8.0.0-SNAPSHOT</version>
+          <version>3.0.0.0-SNAPSHOT</version>
         </plugin>
 
       </plugins>
@@ -560,43 +540,6 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>dependency-check</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <property>
-          <name>release</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.owasp</groupId>
-            <artifactId>dependency-check-maven</artifactId>
-            <configuration>
-              <skip>false</skip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>dependency-check-disabled</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.owasp</groupId>
-            <artifactId>dependency-check-maven</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
           </plugin>
         </plugins>
       </build>

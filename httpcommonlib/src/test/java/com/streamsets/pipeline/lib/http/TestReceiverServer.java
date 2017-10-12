@@ -18,6 +18,7 @@ package com.streamsets.pipeline.lib.http;
 import com.google.common.collect.ImmutableList;
 import com.streamsets.pipeline.api.OnRecordError;
 import com.streamsets.pipeline.api.Stage;
+import com.streamsets.pipeline.api.credential.CredentialValue;
 import com.streamsets.pipeline.lib.tls.TlsConfigBean;
 import com.streamsets.pipeline.sdk.ContextInfoCreator;
 import com.streamsets.pipeline.stage.util.tls.TLSTestUtils;
@@ -31,7 +32,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -72,8 +72,8 @@ public class TestReceiverServer {
       }
 
       @Override
-      public String getAppId() {
-        return "id";
+      public CredentialValue getAppId() {
+        return () -> "id";
       }
 
       @Override
@@ -98,7 +98,7 @@ public class TestReceiverServer {
     };
 
     HttpReceiver receiver = Mockito.mock(HttpReceiverWithFragmenterWriter.class);
-    Mockito.when(receiver.getAppId()).thenReturn("id");
+    Mockito.when(receiver.getAppId()).thenReturn(() -> "id");
     Mockito.when(receiver.getUriPath()).thenReturn("/path");
     BlockingQueue<Exception> exQueue = new ArrayBlockingQueue<>(10);
 
@@ -126,7 +126,7 @@ public class TestReceiverServer {
 
       // valid post
       Mockito.reset(receiver);
-      Mockito.when(receiver.getAppId()).thenReturn("id");
+      Mockito.when(receiver.getAppId()).thenReturn(() -> "id");
       Mockito.when(receiver.validate(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class)))
           .thenReturn(true);
       Mockito.when(receiver.process(Mockito.any(), Mockito.any())).thenReturn(true);
@@ -143,7 +143,7 @@ public class TestReceiverServer {
 
       // invalid post
       Mockito.reset(receiver);
-      Mockito.when(receiver.getAppId()).thenReturn("id");
+      Mockito.when(receiver.getAppId()).thenReturn(() -> "id");
       Mockito.when(receiver.validate(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class)))
           .thenReturn(false);
       conn = (HttpURLConnection) new URL("http://localhost:" + port + "/path").openConnection();
@@ -197,8 +197,8 @@ public class TestReceiverServer {
       }
 
       @Override
-      public String getAppId() {
-        return "id";
+      public CredentialValue getAppId() {
+        return () -> "id";
       }
 
       @Override
@@ -223,7 +223,7 @@ public class TestReceiverServer {
     };
 
     HttpReceiver receiver = Mockito.mock(HttpReceiverWithFragmenterWriter.class);
-    Mockito.when(receiver.getAppId()).thenReturn("id");
+    Mockito.when(receiver.getAppId()).thenReturn(() -> "id");
     Mockito.when(receiver.getUriPath()).thenReturn("/path");
     BlockingQueue<Exception> exQueue = new ArrayBlockingQueue<>(10);
 
@@ -261,16 +261,11 @@ public class TestReceiverServer {
     }
   }
 
-  static final HostnameVerifier ACCEPT_ALL_HOSTNAME_VERIFIER = new HostnameVerifier() {
-    @Override
-    public boolean verify(String s, SSLSession sslSession) {
-      return true;
-    }
-  };
+  static final HostnameVerifier ACCEPT_ALL_HOSTNAME_VERIFIER = (s, sslSession) -> true;
 
   private HttpURLConnection getConnection(
       String path,
-      String appId,
+      CredentialValue appId,
       Stage.Context context,
       String hostPort,
       String trustStoreFile,
@@ -283,7 +278,7 @@ public class TestReceiverServer {
     HttpsURLConnection sslConn = (HttpsURLConnection) conn;
     sslConn.setSSLSocketFactory(createSSLSocketFactory(context, trustStoreFile, trustStorePassword));
     sslConn.setHostnameVerifier(ACCEPT_ALL_HOSTNAME_VERIFIER);
-    conn.setRequestProperty(HttpConstants.X_SDC_APPLICATION_ID_HEADER, appId);
+    conn.setRequestProperty(HttpConstants.X_SDC_APPLICATION_ID_HEADER, appId.get());
     return conn;
   }
 

@@ -20,7 +20,6 @@ import com.streamsets.pipeline.api.base.OnRecordErrorException;
 import com.streamsets.pipeline.api.impl.Utils;
 import com.streamsets.pipeline.lib.parser.net.netflow.Errors;
 import com.streamsets.pipeline.lib.parser.net.netflow.NetflowCommonDecoder;
-import com.streamsets.pipeline.lib.parser.net.netflow.OutputValuesMode;
 import com.streamsets.pipeline.lib.parser.net.netflow.UUIDs;
 import com.streamsets.pipeline.lib.parser.net.netflow.VersionSpecificNetflowDecoder;
 import io.netty.buffer.ByteBuf;
@@ -197,7 +196,7 @@ public class NetflowV5Decoder implements VersionSpecificNetflowDecoder<NetflowV5
       msg.setdOctets(octets);
 
       // 46-47 is "pad2" (unused zero bytes)
-      buf.readBytes(2);
+      buf.skipBytes(2);
       result.add(msg);
       readIndex++;
       parentDecoder.doCheckpoint();

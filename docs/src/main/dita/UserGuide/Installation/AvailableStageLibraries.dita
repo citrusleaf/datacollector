@@ -64,9 +64,10 @@
                         </row>
                         <row>
                             <entry>streamsets-datacollector-apache-kafka_0_10-lib</entry>
-                            <entry>For Kafka version 0.10.<p>Includes:<ul id="ul_jyh_nml_zw">
+                            <entry>For Kafka version 0.10.x.<p>Includes:<ul id="ul_jyh_nml_zw">
                                         <li>HTTP to Kafka origin</li>
                                         <li>Kafka Consumer origin</li>
+                                        <li>Kafka Multitopic Consumer origin</li>
                                         <li>SDC RPC to Kafka origin</li>
                                         <li>UDP to Kafka origin</li>
                                         <li>Kafka Producer destination</li>
@@ -491,6 +492,10 @@
                                     </ul></p></entry>
                         </row>
                         <row>
+                            <entry>streamsets-datacollector-cyberark-credentialstore-lib</entry>
+                            <entry>For the CyberArk credential store system.</entry>
+                        </row>
+                        <row>
                             <entry>streamsets-datacollector-elasticsearch_5-lib</entry>
                             <entry>For Elasticsearch 1.x, 2.x, and 5.x.<p>Includes the Elasticsearch
                                     origin and destination.</p></entry>
@@ -500,6 +505,7 @@
                             <entry>For Google Cloud.<p>Includes: <ul id="ul_dzd_5rq_v1b">
                                         <li>Google BigQuery origin</li>
                                         <li>Google Pub/Sub Subscriber origin</li>
+                                        <li>Google BigQuery destination</li>
                                         <li>Google Pub/Sub Publisher destination</li>
                                     </ul></p></entry>
                         </row>

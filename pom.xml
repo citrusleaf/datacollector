@@ -22,7 +22,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.streamsets</groupId>
   <artifactId>streamsets-datacollector</artifactId>
-  <version>2.8.0.0-SNAPSHOT</version>
+  <version>3.0.0.0-SNAPSHOT</version>
   <description>StreamSets Data Collector</description>
   <name>StreamSets Data Collector</name>
   <packaging>pom</packaging>
@@ -93,12 +93,12 @@
       <dependency>
         <groupId>com.streamsets</groupId>
         <artifactId>streamsets-datacollector-api</artifactId>
-        <version>2.8.0.0-SNAPSHOT</version>
+        <version>3.0.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.streamsets</groupId>
         <artifactId>streamsets-datacollector-spark-api</artifactId>
-        <version>2.8.0.0-SNAPSHOT</version>
+        <version>3.0.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -160,10 +160,13 @@
     <module>kafka-common</module>
     <module>kafka_source-protolib</module>
     <module>kafka_multisource-protolib</module>
+    <module>kafka_multisource-0_9-protolib</module>
+    <module>kafka_multisource-0_10-protolib</module>
     <module>kafka_target-protolib</module>
     <module>maprstreams-common</module>
     <module>maprstreams-target-protolib</module>
     <module>maprstreams-source-protolib</module>
+    <module>maprstreams-multisource-protolib</module>
     <module>jython-protolib</module>
     <module>groovy-protolib</module>
 
@@ -313,9 +316,31 @@
       </plugin>
     </plugins>
   </build>
-
   <reporting>
     <plugins>
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>2.1.1</version>
+        <inherited>false</inherited>
+        <configuration>
+          <!-- skip non-bundled jars -->
+          <skipProvidedScope>true</skipProvidedScope>
+          <skipRuntimeScope>true</skipRuntimeScope>
+          <!-- We want HTML for easy viewing, but XML for reporting via SonarQube -->
+          <format>ALL</format>
+          <suppressionFile>${basedir}/dependency-check-suppression.xml</suppressionFile>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -433,13 +458,19 @@
         <groovy_2_4-lib>groovy_2_4-lib</groovy_2_4-lib>
         <hdp_2_2-lib>hdp_2_2-lib</hdp_2_2-lib>
         <hdp_2_3-lib>hdp_2_3-lib</hdp_2_3-lib>
+        <hdp_2_3-hive1-lib>hdp_2_3-hive1-lib</hdp_2_3-hive1-lib>
         <hdp_2_4-lib>hdp_2_4-lib</hdp_2_4-lib>
+        <hdp_2_4-hive1-lib>hdp_2_4-hive1-lib</hdp_2_4-hive1-lib>
         <hdp_2_5-lib>hdp_2_5-lib</hdp_2_5-lib>
+        <hdp_2_5-flume-lib>hdp_2_5-flume-lib</hdp_2_5-flume-lib>
         <hdp_2_6-lib>hdp_2_6-lib</hdp_2_6-lib>
+        <hdp_2_6_2-hive1-lib>hdp_2_6_2-hive1-lib</hdp_2_6_2-hive1-lib>
+        <hdp_2_6-flume-lib>hdp_2_6-flume-lib</hdp_2_6-flume-lib>
         <jython_2_7-lib>jython_2_7-lib</jython_2_7-lib>
         <mapr_5_0-lib>mapr_5_0-lib</mapr_5_0-lib>
         <mapr_5_1-lib>mapr_5_1-lib</mapr_5_1-lib>
         <mapr_5_2-lib>mapr_5_2-lib</mapr_5_2-lib>
+        <mapr_6_0_lib>mapr_6_0-lib</mapr_6_0_lib>
         <mapr_spark_2_1_mep_3_0-lib>mapr_spark_2_1_mep_3_0-lib</mapr_spark_2_1_mep_3_0-lib>
         <mongodb_3-lib>mongodb_3-lib</mongodb_3-lib>
       </properties>
@@ -488,13 +519,19 @@
         <module>groovy_2_4-lib</module>
         <module>hdp_2_2-lib</module>
         <module>hdp_2_3-lib</module>
+        <module>hdp_2_3-hive1-lib</module>
         <module>hdp_2_4-lib</module>
+        <module>hdp_2_4-hive1-lib</module>
         <module>hdp_2_5-lib</module>
+        <module>hdp_2_5-flume-lib</module>
         <module>hdp_2_6-lib</module>
+        <module>hdp_2_6_2-hive1-lib</module>
+        <module>hdp_2_6-flume-lib</module>
         <module>jython_2_7-lib</module>
         <module>mapr_5_0-lib</module>
         <module>mapr_5_1-lib</module>
         <module>mapr_5_2-lib</module>
+        <module>mapr_6_0-lib</module>
         <module>mapr_spark_2_1_mep_3_0-lib</module>
         <module>mongodb_3-lib</module>
       </modules>
@@ -527,8 +564,10 @@
         <elasticsearch_5-lib>elasticsearch_5-lib</elasticsearch_5-lib>
         <groovy_2_4-lib>groovy_2_4-lib</groovy_2_4-lib>
         <hdp_2_6-lib>hdp_2_6-lib</hdp_2_6-lib>
+        <hdp_2_6_2-hive1-lib>hdp_2_6_2-hive1-lib</hdp_2_6_2-hive1-lib>
+        <hdp_2_6-flume-lib>hdp_2_6-flume-lib</hdp_2_6-flume-lib>
         <jython_2_7-lib>jython_2_7-lib</jython_2_7-lib>
-        <mapr_5_2-lib>mapr_5_2-lib</mapr_5_2-lib>
+        <mapr_6_0-lib>mapr_6_0-lib</mapr_6_0-lib>
         <mapr_spark_2_1_mep_3_0-lib>mapr_spark_2_1_mep_3_0-lib</mapr_spark_2_1_mep_3_0-lib>
         <mongodb_3-lib>mongodb_3-lib</mongodb_3-lib>
         <azure-lib>azure_lib</azure-lib>
@@ -552,8 +591,10 @@
         <module>elasticsearch_5-lib</module>
         <module>groovy_2_4-lib</module>
         <module>hdp_2_6-lib</module>
+        <module>hdp_2_6_2-hive1-lib</module>
+        <module>hdp_2_6-flume-lib</module>
         <module>jython_2_7-lib</module>
-        <module>mapr_5_2-lib</module>
+        <module>mapr_6_0-lib</module>
         <module>mapr_spark_2_1_mep_3_0-lib</module>
         <module>mongodb_3-lib</module>
       </modules>

@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableList;
 import com.streamsets.pipeline.api.impl.Utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class LaneResolver {
@@ -28,7 +27,7 @@ public class LaneResolver {
   static final String STAGE_OUT       = SEPARATOR + "s";
   static final String OBSERVER_OUT    = SEPARATOR + "o";
   static final String MULTIPLEXER_OUT = SEPARATOR + "m";
-  private static final String ROUTING_SEPARATOR = "--";
+  static final String ROUTING_SEPARATOR = "--";
 
   private static void validatePostFix(String postFix) {
     Utils.checkState(postFix.length() == POSTFIX_LEN, Utils.format("'{}' invalid length, it should be '{}'", postFix,

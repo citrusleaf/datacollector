@@ -20,13 +20,12 @@ import com.streamsets.pipeline.api.ConfigDefBean;
 import com.streamsets.pipeline.api.ValueChooserModel;
 import com.streamsets.pipeline.config.DataFormat;
 import com.streamsets.pipeline.lib.el.RecordEL;
-import com.streamsets.pipeline.lib.el.VaultEL;
 import com.streamsets.pipeline.lib.tls.TlsConfigBean;
 import com.streamsets.pipeline.stage.destination.http.DataFormatChooserValues;
 import com.streamsets.pipeline.stage.destination.lib.DataGeneratorFormatConfig;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Bean specifying the configuration for an WebSocket Client Target instance.
@@ -65,10 +64,9 @@ public class WebSocketTargetConfig {
       label = "Headers",
       description = "Headers to include in the request",
       displayPosition = 70,
-      elDefs = {RecordEL.class, VaultEL.class},
       group = "WEB_SOCKET"
   )
-  public Map<String, String> headers = new HashMap<>();
+  public List<HeaderBean> headers = Collections.emptyList();
 
   @ConfigDef(
       required = true,

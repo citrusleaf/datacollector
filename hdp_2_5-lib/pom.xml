@@ -23,24 +23,22 @@
   <parent>
     <groupId>com.streamsets</groupId>
     <artifactId>streamsets-datacollector-stage-lib-parent</artifactId>
-    <version>2.8.0.0-SNAPSHOT</version>
+    <version>3.0.0.0-SNAPSHOT</version>
     <relativePath>../stage-lib-parent</relativePath>
   </parent>
-  <groupId>com.streamsets</groupId>
   <artifactId>streamsets-datacollector-hdp_2_5-lib</artifactId>
-  <version>2.8.0.0-SNAPSHOT</version>
+  <version>3.0.0.0-SNAPSHOT</version>
   <description>StreamSets Data Collector HDP 2.5.0 Lib</description>
   <name>StreamSets Data Collector HDP 2.5.0 Lib</name>
   <packaging>jar</packaging>
 
   <properties>
-    <flume.version>1.5.2.2.5.0.0-1245</flume.version>
     <hadoop.version>2.7.3.2.5.0.0-1245</hadoop.version>
     <hbase.version>1.1.2.2.5.0.0-1245</hbase.version>
     <hive.version>1.2.1000.2.5.0.0-1245</hive.version>
     <kafka.version>0.10.0.2.5.0.0-1245</kafka.version>
     <spark.version>1.6.2.2.5.0.0-1245</spark.version>
-    <thrift.version>0.9.0</thrift.version>
+    <thrift.version>0.9.3</thrift.version>
     <zk-client.version>0.5-1</zk-client.version>
     <avro.version>1.7.7</avro.version>
     <h2.version>1.4.187</h2.version>
@@ -310,21 +308,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Flume related -->
-
-    <dependency>
-      <groupId>com.streamsets</groupId>
-      <artifactId>streamsets-datacollector-flume-protolib</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.flume</groupId>
-          <artifactId>flume-ng-sdk</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- Kafka related -->
     <dependency>
       <groupId>com.streamsets</groupId>
@@ -391,7 +374,7 @@
     </dependency>
     <dependency>
       <groupId>com.streamsets</groupId>
-      <artifactId>streamsets-datacollector-kafka_multisource-protolib</artifactId>
+      <artifactId>streamsets-datacollector-kafka_multisource-0_10-protolib</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
       <exclusions>
@@ -455,39 +438,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Explicitly add dependency on thrift version 0.9.0 -->
-    <dependency>
-      <groupId>org.apache.thrift</groupId>
-      <artifactId>libthrift</artifactId>
-      <version>${thrift.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.flume</groupId>
-      <artifactId>flume-ng-sdk</artifactId>
-      <version>${flume.version}</version>
-      <scope>compile</scope>
-    </dependency>
-
     <!-- Test dependencies-->
-    <dependency>
-      <groupId>org.apache.flume</groupId>
-      <artifactId>flume-ng-core</artifactId>
-      <version>${flume.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.flume</groupId>
-      <artifactId>flume-ng-configuration</artifactId>
-      <version>${flume.version}</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>com.streamsets</groupId>
       <artifactId>streamsets-datacollector-commonlib</artifactId>
@@ -601,7 +552,6 @@
                 <source>${basedir}/../mapreduce-protolib/src/test/java</source>
                 <source>${basedir}/../hive-protolib/src/test/java</source>
                 <source>${basedir}/../hbase-protolib/src/test/java</source>
-                <source>${basedir}/../flume-protolib/src/test/java</source>
                 <source>${basedir}/../kafka_source-protolib/src/test/java</source>
                 <source>${basedir}/../kafka_multisource-protolib/src/test/java</source>
                 <source>${basedir}/../kafka_target-protolib/src/test/java</source>
@@ -628,9 +578,6 @@
                 </resource>
                 <resource>
                   <directory>${basedir}/../hbase-protolib/src/test/resources</directory>
-                </resource>
-                <resource>
-                  <directory>${basedir}/../flume-protolib/src/test/resources</directory>
                 </resource>
                 <resource>
                   <directory>${basedir}/../kafka_source-protolib/src/test/resources</directory>

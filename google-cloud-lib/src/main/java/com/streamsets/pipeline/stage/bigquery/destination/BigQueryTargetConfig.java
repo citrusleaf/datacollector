@@ -17,20 +17,17 @@ package com.streamsets.pipeline.stage.bigquery.destination;
 
 import com.streamsets.pipeline.api.ConfigDef;
 import com.streamsets.pipeline.api.ConfigDefBean;
-import com.streamsets.pipeline.api.ListBeanModel;
 import com.streamsets.pipeline.lib.el.RecordEL;
 import com.streamsets.pipeline.stage.lib.GoogleCloudCredentialsConfig;
-
-import java.util.List;
 
 public class BigQueryTargetConfig {
 
   @ConfigDef(
       required = true,
-      label = "Dataset Expression",
+      label = "Dataset",
       type = ConfigDef.Type.STRING,
       defaultValue = "${record:attribute('dataset')}",
-      description = "Use an expression language to obtain dataset name from record",
+      description = "Dataset name or an expression to obtain the dataset name from the record",
       displayPosition = 10,
       group = "BIGQUERY",
       evaluation = ConfigDef.Evaluation.EXPLICIT,
@@ -40,10 +37,10 @@ public class BigQueryTargetConfig {
 
   @ConfigDef(
       required = true,
-      label = "Table Name Expression",
+      label = "Table Name",
       type = ConfigDef.Type.STRING,
       defaultValue = "${record:attribute('table')}",
-      description = "Use an expression language to obtain table name name from record",
+      description = "Table name or an expression to obtain the table name from the record",
       displayPosition = 20,
       group = "BIGQUERY",
       evaluation = ConfigDef.Evaluation.EXPLICIT,
@@ -54,9 +51,10 @@ public class BigQueryTargetConfig {
   @ConfigDef(
       //Not needed, if not configured, its considered a plain insert without row id
       required = false,
-      label = "Row Id Expression",
+      label = "Insert Id Expression",
       type = ConfigDef.Type.STRING,
-      description = "Use an expression language to specify a row id to perform insert/update",
+      description = "Expression for the insertId to insert or update. " +
+          "Leave blank to perform an insert for each record",
       displayPosition = 30,
       group = "BIGQUERY",
       evaluation = ConfigDef.Evaluation.EXPLICIT,
@@ -64,42 +62,30 @@ public class BigQueryTargetConfig {
   )
   public String rowIdExpression;
 
-
-  @ConfigDef(
-      required = true,
-      type = ConfigDef.Type.BOOLEAN,
-      defaultValue = "false",
-      label = "Implicit field mapping",
-      description = "If set, field paths will be implicitly mapped to Big Query columns",
-      displayPosition = 40,
-      group = "BIGQUERY"
-  )
-  public boolean implicitFieldMapping;
-
   @ConfigDef(
       required = false,
       type = ConfigDef.Type.BOOLEAN,
       defaultValue = "true",
       label = "Ignore Invalid Column",
-      description = "If enabled, field paths that cannot be mapped to column will be ignored",
-      displayPosition = 30,
+      description = "If enabled, field paths that cannot be mapped to columns will be ignored",
+      displayPosition = 40,
       group = "BIGQUERY"
   )
   public boolean ignoreInvalidColumn;
 
   @ConfigDef(
-      required = false,
-      type = ConfigDef.Type.MODEL,
-      label = "Fields",
-      description = "Column names, their values and storage type",
+      required =  true,
+      type = ConfigDef.Type.NUMBER,
+      defaultValue = "-1",
+      label = "Table Cache size",
+      description = "Configures the cache size for storing TableId entries." +
+          " Use -1 for unlimited number of tableId entries in the cache.",
       displayPosition = 50,
       group = "BIGQUERY",
-      dependsOn = "implicitFieldMapping",
-      triggeredByValue = "false"
+      min = -1,
+      max = Integer.MAX_VALUE
   )
-  @ListBeanModel
-  public List<BigQueryFieldMappingConfig> bigQueryFieldMappingConfigs;
-
+  public int maxCacheSize = -1;
 
   @ConfigDefBean(groups = "CREDENTIALS")
   public GoogleCloudCredentialsConfig credentials = new GoogleCloudCredentialsConfig();

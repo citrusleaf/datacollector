@@ -24,8 +24,6 @@ import com.google.common.collect.Sets;
 import com.streamsets.pipeline.api.Field;
 import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.api.el.ELEvalException;
-import com.streamsets.pipeline.api.ext.DataCollectorServices;
-import com.streamsets.pipeline.api.ext.json.JsonMapper;
 import com.streamsets.pipeline.lib.jdbc.JdbcErrors;
 import com.streamsets.pipeline.lib.jdbc.JdbcUtil;
 import com.streamsets.pipeline.lib.jdbc.multithread.TableContext;
@@ -37,7 +35,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,7 +47,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class OffsetQueryUtil {
-  private static final JsonMapper JSON_MAPPER = DataCollectorServices.instance().get(JsonMapper.SERVICE_KEY);
   private static final Logger LOG = LoggerFactory.getLogger(OffsetQueryUtil.class);
 
   private static final Joiner COMMA_SPACE_JOINER = Joiner.on(", ");
@@ -141,6 +137,21 @@ public final class OffsetQueryUtil {
     }
   }
 
+  public static String buildBaseTableQuery(
+      TableRuntimeContext tableRuntimeContext,
+      String quoteChar
+  ) throws ELEvalException {
+    final TableContext tableContext = tableRuntimeContext.getSourceTableContext();
+    return String.format(
+        TABLE_QUERY_SELECT,
+        TableContextUtil.getQuotedQualifiedTableName(
+            tableContext.getSchema(),
+            tableContext.getTableName(),
+            quoteChar
+        )
+    );
+  }
+
   /**
    * Build query using the lastOffset which is of the form (<column1>=<value1>::<column2>=<value2>::<column3>=<value3>)
    *
@@ -157,16 +168,7 @@ public final class OffsetQueryUtil {
     final TableContext tableContext = tableRuntimeContext.getSourceTableContext();
     StringBuilder queryBuilder = new StringBuilder();
     List<Pair<Integer, String>> paramValueToSet = new ArrayList<>();
-    queryBuilder.append(
-        String.format(
-            TABLE_QUERY_SELECT,
-            TableContextUtil.getQuotedQualifiedTableName(
-                tableContext.getSchema(),
-                tableContext.getTableName(),
-                quoteChar
-            )
-        )
-    );
+    queryBuilder.append(buildBaseTableQuery(tableRuntimeContext, quoteChar));
 
     Map<String, String> storedTableToOffset = getColumnsToOffsetMapFromOffsetFormat(lastOffset);
     final boolean noStoredOffsets = storedTableToOffset.isEmpty();
@@ -422,42 +424,6 @@ public final class OffsetQueryUtil {
         }
 
         offsetMap.put(parts[0], parts[1]);
-      }
-    }
-    return offsetMap;
-  }
-  /**
-   * Serialize the Map of table to offset to a String
-   * @param offsetMap Map of table to Offset.
-   * @return Serialized offset
-   * @throws StageException When Serialization exception happens
-   */
-  public static String serializeOffsetMap(Map<String, String> offsetMap) throws StageException {
-    try {
-      return JSON_MAPPER.writeValueAsString(offsetMap);
-    } catch (IOException ex) {
-      LOG.error("Error when serializing", ex);
-      throw new StageException(JdbcErrors.JDBC_60, ex);
-    }
-  }
-
-  /**
-   * Deserialize String offset to Map of table to offset
-   * @param lastSourceOffset Serialized offset String
-   * @return Map of table to lastOffset
-   * @throws StageException When Deserialization exception happens
-   */
-  @SuppressWarnings("unchecked")
-  public static Map<String, String> deserializeOffsetMap(String lastSourceOffset) throws StageException {
-    Map<String, String> offsetMap;
-    if (StringUtils.isEmpty(lastSourceOffset)) {
-      offsetMap = new HashMap<>();
-    } else {
-      try {
-        offsetMap = JSON_MAPPER.readValue(lastSourceOffset, Map.class);
-      } catch (IOException ex) {
-        LOG.error("Error when deserializing", ex);
-        throw new StageException(JdbcErrors.JDBC_61, ex);
       }
     }
     return offsetMap;
