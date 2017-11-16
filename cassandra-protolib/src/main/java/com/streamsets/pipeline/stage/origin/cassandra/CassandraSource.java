@@ -20,15 +20,16 @@
 package com.streamsets.pipeline.stage.origin.cassandra;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Set;
 
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.Row;
-import com.google.common.reflect.TypeToken;
 import com.streamsets.pipeline.api.BatchMaker;
 import com.streamsets.pipeline.api.Field;
 import com.streamsets.pipeline.api.Record;
@@ -37,147 +38,177 @@ import com.streamsets.pipeline.lib.util.JsonUtil;
 
 public class CassandraSource extends BaseCassandraSource {
 
-  /**
-   * Creates a new instance of cassandra source.
-   *
-   * @param cassanddraOriginConfigBean origin configuration
-   */
-  public CassandraSource(CassandraOriginConfigBean cassandraOriginConfigBean) {
-    super(cassandraOriginConfigBean);
-   }
+	/**
+	 * Creates a new instance of cassandra source.
+	 *
+	 * @param cassanddraOriginConfigBean
+	 *            origin configuration
+	 */
+	public CassandraSource(CassandraOriginConfigBean cassandraOriginConfigBean) {
+		super(cassandraOriginConfigBean);
+	}
 
-  @Override
-  protected List<ConfigIssue> init() {
-    // Validate configuration values and open any required resources.
-    List<ConfigIssue> issues = super.init();
+	@Override
+	protected List<ConfigIssue> init() {
+		// Validate configuration values and open any required resources.
+		List<ConfigIssue> issues = super.init();
 
-    try{
-    	createCassandraClient(issues);    	
-    }catch(StageException se){}
+		try {
+			createCassandraClient(issues);
+		} catch (StageException se) {
+		}
 
-    // If issues is not empty, the UI will inform the user of each configuration issue in the list.
-    return issues;
-  }
+		// If issues is not empty, the UI will inform the user of each configuration
+		// issue in the list.
+		return issues;
+	}
 
-  @Override
-  public void destroy() {
-    super.destroy();
-  }
+	@Override
+	public void destroy() {
+		super.destroy();
+	}
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String produce(String lastSourceOffset, int maxBatchSize, BatchMaker batchMaker) throws StageException {
-    // Offsets can vary depending on the data source. Here we use an integer as an example only.
-    long nextSourceOffset = 0;
-    lastSourceOffset = lastSourceOffset == null ? "" : lastSourceOffset;
-    if (!lastSourceOffset.equals("")) {
-      nextSourceOffset = Long.parseLong(lastSourceOffset);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String produce(String lastSourceOffset, int maxBatchSize, BatchMaker batchMaker) throws StageException {
+		// Offsets can vary depending on the data source. Here we use an integer as an
+		// example only.
+		long nextSourceOffset = 0;
+		lastSourceOffset = lastSourceOffset == null ? "" : lastSourceOffset;
+		if (!lastSourceOffset.equals("")) {
+			nextSourceOffset = Long.parseLong(lastSourceOffset);
+		}
 
-    int recordCounter = 0;
-    long startTime = System.currentTimeMillis();
-    int maxRecords = Math.min(maxBatchSize, conf.maxBatchSize);
+		int recordCounter = 0;
+		long startTime = System.currentTimeMillis();
+		int maxRecords = Math.min(maxBatchSize, conf.maxBatchSize);
 
-    while (recordCounter < maxRecords && (startTime + conf.maxWaitTime) > System.currentTimeMillis()) {
-      
-    	Row row = rs.one();
-    	if(row == null) break;
-    	recordCounter++;
-   // 	Record rec = new RecordImpl();
-        final String recordContext = conf.contactNodes.get(0) + "::" +
-                conf.keyspace + "::" + conf.tableName + "::" +
-                nextSourceOffset;
-        Record record = getContext().createRecord(recordContext);
+		while (recordCounter < maxRecords && (startTime + conf.maxWaitTime) > System.currentTimeMillis()) {
 
-        Map<String, Field> fields = new HashMap<>();
-        ColumnDefinitions colDef = row.getColumnDefinitions();
-        List<ColumnDefinitions.Definition>    cdList = colDef.asList();
-        for (ColumnDefinitions.Definition cd : cdList) {
-            Field value;
-            Object fieldObject = null;
-            DataType dt = cd.getType();
-            switch (dt.getName()) {
-            case ASCII :
-            case VARCHAR :
-            case TEXT :
-                fieldObject = row.getString(cd.getName());
-                break;
-                
-            case COUNTER :
-            case INT :
-                fieldObject = new Integer( row.getInt(cd.getName()));
-                break;
-                
-            case BLOB :
-            case CUSTOM :
-            	fieldObject = row.getBytes(cd.getName());
-                break;
-                
-            case BOOLEAN :
-            	fieldObject = row.getBool(cd.getName());
-                break;
-            
-            case DECIMAL :
-            	fieldObject = row.getDecimal(cd.getName());
-                break;
-                
-            case DOUBLE :
-            	fieldObject = new Double( row.getDouble(cd.getName()));
-                break;
-                
-            case FLOAT :
-            	fieldObject = new Float( row.getFloat(cd.getName()));
-                break;
-                
-            case LIST :
-                row.getList(cd.getName(), TypeToken.class);
-                break;
+			Row row = rs.one();
+			if (row == null)
+				break;
+			recordCounter++;
+			// Record rec = new RecordImpl();
+			final String recordContext = conf.contactNodes.get(0) + "::" + conf.keyspace + "::" + conf.tableName + "::"
+					+ nextSourceOffset;
+			Record record = getContext().createRecord(recordContext);
 
-            case TIMESTAMP :
-            	fieldObject = row.getTimestamp(cd.getName());
-                break;
+			Map<String, Field> fields = new HashMap<>();
+			ColumnDefinitions colDef = row.getColumnDefinitions();
+			List<ColumnDefinitions.Definition> cdList = colDef.asList();
+			for (ColumnDefinitions.Definition cd : cdList) {
+				Field value;
+				Object fieldObject = null;
+				DataType dt = cd.getType();
+				switch (dt.getName()) {
+				case ASCII:
+				case VARCHAR:
+				case TEXT:
+					fieldObject = row.getString(cd.getName());
+					break;
 
-            case UUID :
-            	fieldObject = row.getUUID(cd.getName());
-                break;
+				case COUNTER:
+				case INT:
+					fieldObject = new Integer(row.getInt(cd.getName()));
+					break;
 
-            case BIGINT :
-            	fieldObject = new Long(row.getLong(cd.getName()));
-                break;
-                
-            case VARINT :    
-            	fieldObject = row.getVarint(cd.getName());
-                break;    
-                
-            case MAP :
-            case SET :
-                
-            case INET :
-            case TIMEUUID :
-            case TUPLE :
-            case UDT :
-                
-            default:
-                continue;
-                
-            }
-            try {
-            value = JsonUtil.jsonToField(fieldObject);
-            fields.put(cd.getName(), value);
-            } catch (Exception e) {
-            	e.printStackTrace();
-            }
-            
-        }
-        
-        record.set(Field.create(fields));
-        batchMaker.addRecord(record);
-        //System.out.format("%s %f\n", row.getString("ticker"), row.getDecimal("close"));
-    }
-    	
-    return lastSourceOffset;
-  }
+				case BLOB:
+				case CUSTOM:
+					fieldObject = row.getBytes(cd.getName());
+					break;
+
+				case BOOLEAN:
+					fieldObject = row.getBool(cd.getName());
+					break;
+
+				case DECIMAL:
+					fieldObject = row.getDecimal(cd.getName());
+					break;
+
+				case DOUBLE:
+					fieldObject = new Double(row.getDouble(cd.getName()));
+					break;
+
+				case FLOAT:
+					fieldObject = new Float(row.getFloat(cd.getName()));
+					break;
+
+				case TIMESTAMP:
+					fieldObject = row.getTimestamp(cd.getName());
+					break;
+
+				case UUID:
+					fieldObject = row.getUUID(cd.getName());
+					break;
+
+				case BIGINT:
+					fieldObject = new Long(row.getLong(cd.getName()));
+					break;
+
+				case VARINT:
+					fieldObject = row.getVarint(cd.getName());
+					break;
+
+				case LIST:
+				case MAP:
+				case SET:
+					fieldObject = row.getObject(cd.getName());
+					break;
+
+				case INET:
+				case TIMEUUID:
+				case TUPLE:
+				case UDT:
+
+				default:
+					continue;
+
+				}
+				try {
+					value = jsonToField(fieldObject);
+					fields.put(cd.getName(), value);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+
+			record.set(Field.create(fields));
+			batchMaker.addRecord(record);
+			// System.out.format("%s %f\n", row.getString("ticker"),
+			// row.getDecimal("close"));
+		}
+
+		return lastSourceOffset;
+	}
+
+	private static Field jsonToField(Object object) throws IOException {
+		if (object instanceof List) {
+			List<?> jsonList = (List<?>) object;
+			List<Field> list = new ArrayList<>(jsonList.size());
+			for (Object element : jsonList) {
+				list.add(jsonToField(element));
+			}
+			return Field.create(list);
+		} else if (object instanceof Set) {
+			Set<?> jsonSet = (Set<?>) object;
+			List<Field> set = new ArrayList<>(jsonSet.size());
+			for (Object element : jsonSet) {
+				set.add(jsonToField(element));
+			}
+			return Field.create(set);
+		} else if (object instanceof Map) {
+			Map<?,?> jsonMap = (Map<?,?>) object;
+			Map<String, Field> map = new LinkedHashMap<>();
+			for (Map.Entry<?, ?> entry : jsonMap.entrySet()) {
+				map.put(entry.getKey().toString(), jsonToField(entry.getValue()));
+			}
+			return Field.create(map);
+		}
+		return JsonUtil.jsonToField(object);
+	}
 
 }
