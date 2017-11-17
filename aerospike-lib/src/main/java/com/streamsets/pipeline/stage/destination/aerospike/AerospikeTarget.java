@@ -21,32 +21,30 @@ package com.streamsets.pipeline.stage.destination.aerospike;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
-import com.aerospike.client.Operation;
 import com.aerospike.client.Value;
-import com.aerospike.client.command.OperateCommand;
 import com.aerospike.client.policy.ClientPolicy;
 import com.aerospike.client.policy.WritePolicy;
-import com.streamsets.pipeline.stage.destination.display.BinNameTooLongAction;
-import com.streamsets.pipeline.stage.destination.display.DataType;
-import com.streamsets.pipeline.stage.destination.display.Groups;
-import com.streamsets.pipeline.stage.destination.lib.sample.Errors;
 import com.streamsets.pipeline.api.Batch;
 import com.streamsets.pipeline.api.Field;
-import com.streamsets.pipeline.api.Field.Type;
 import com.streamsets.pipeline.api.Record;
 import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.api.base.BaseTarget;
 import com.streamsets.pipeline.api.base.OnRecordErrorException;
 import com.streamsets.pipeline.api.impl.Utils;
+import com.streamsets.pipeline.stage.destination.display.BinNameTooLongAction;
+import com.streamsets.pipeline.stage.destination.display.DataType;
+import com.streamsets.pipeline.stage.destination.display.Groups;
 
 /**
  * This target is an example and does not actually write to any destination.
@@ -208,6 +206,9 @@ public class AerospikeTarget extends BaseTarget {
 			case BYTE_ARRAY:
 				bin = new Bin(binName, value.getValueAsByteArray());
 				break;
+			case MAP:
+				bin = new Bin(binName, Value.get(unpackField(value)));
+				break;
 			default:
 				bin = new Bin(binName, Value.get(value.getValue()));
 				break;
@@ -265,7 +266,7 @@ public class AerospikeTarget extends BaseTarget {
 				else {
 					LOG.error("Path '{}' contains no valid bin name after a final / character", path);
 				}
-				if (binName != null && field != null) {
+				if (binName != null && field != null && binName != conf.keyExpr) {
 					if (conf.binNameTooLongAction == BinNameTooLongAction.TRUNCATE && binName.length() > MAX_BIN_NAME) {
 						binName = binName.substring(0, MAX_BIN_NAME);
 					}
@@ -293,49 +294,35 @@ public class AerospikeTarget extends BaseTarget {
 			throw new OnRecordErrorException(Errors.SAMPLE_01, record, "No bins to write, check log for details.");
 		}
 	}
+	
+	private Object unpackField(Field field){
+		switch (field.getType()) {
+		case STRING:
+			return field.getValueAsString();
+		case INTEGER:
+			return field.getValueAsInteger();
+		case LONG:
+			return field.getValueAsLong();
+		case BYTE_ARRAY:
+			return field.getValueAsByteArray();
+		case MAP:
+			@SuppressWarnings("unchecked") Map<String, ?> fieldMap = (Map<String, ?>) field.getValue();
+			Map<String, Object> map = new LinkedHashMap<>();
+			for (Map.Entry<String, ?> entry : fieldMap.entrySet()) {
+				if(entry.getValue() instanceof Field)
+					map.put(entry.getKey(), unpackField((Field)entry.getValue()));
+				else map.put(entry.getKey(), entry.getValue());
+			}
+			return map;
+		case LIST:
+			List<?> fList = (List<?>) field.getValue();
+			List<Object> list = new ArrayList<>(fList.size());
+			for (Object element : fList) {
+				if(element instanceof Field) list.add(unpackField((Field)element));
+				else list.add(element);
+			}
+			return list;			
+		default: return field.getValue();
+		}
+	}
 }
-//				  switch (parameters.dataType) {
-//				  	case STRING:
-//				  		if (value.getType() == Field.Type.STRING) {
-//				  			bins.add(new Bin(binName, value.getValueAsString()));
-//				  		}
-//            		  client.put(null, new Key("test", "testSet", "X"), new Bin(binName, "x"));
-//            	  }
-//                doUpsertString(record, tempRecord, p, key, value);
-//                break;
-//              case LIST:
-//                doUpsertList(record, tempRecord, p, key, value);
-//                break;
-//              case SET:
-//                doUpsertSet(record, tempRecord, p, key, value);
-//                break;
-//              case HASH:
-//                doUpsertHash(record, tempRecord, p, key, value);
-//                break;
-//              default:
-//                LOG.error(Errors.REDIS_05.getMessage(), parameters.dataType);
-//                errorRecordHandler.onError(
-//                    new OnRecordErrorException(
-//                        record,
-//                        Errors.REDIS_05,
-//                        parameters.dataType
-//                    )
-//                );
-//                break;
-//            }
-//          } else {
-//            LOG.warn(Errors.REDIS_07.getMessage(), parameters.keyExpr, parameters.valExpr, record);
-//          }
-//        }
-
-// This is a contrived example, normally you may be performing an operation that could throw
-// an exception or produce an error condition. In that case you can throw an OnRecordErrorException
-// to send this record to the error pipeline with some details.
-//    if (!record.has("/someField")) {
-//      throw new OnRecordErrorException(Errors.SAMPLE_01, record, "exception detail message.");
-//    }
-
-// TODO: write the records to your final destination
-//  }
-//
-//}
