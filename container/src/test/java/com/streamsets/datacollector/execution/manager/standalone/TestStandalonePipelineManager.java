@@ -33,6 +33,8 @@ import com.streamsets.datacollector.execution.runner.standalone.StandaloneRunner
 import com.streamsets.datacollector.execution.snapshot.file.FileSnapshotStore;
 import com.streamsets.datacollector.execution.store.FilePipelineStateStore;
 import com.streamsets.datacollector.lineage.LineagePublisherTask;
+import com.streamsets.datacollector.main.BuildInfo;
+import com.streamsets.datacollector.main.DataCollectorBuildInfo;
 import com.streamsets.datacollector.main.RuntimeInfo;
 import com.streamsets.datacollector.main.RuntimeModule;
 import com.streamsets.datacollector.main.StandaloneRuntimeInfo;
@@ -111,6 +113,11 @@ public class TestStandalonePipelineManager {
     public TestPipelineManagerModule(long expiry, long initialExpiryDelay) {
       this.initialExpiryDelay = initialExpiryDelay;
       this.expiry = expiry;
+    }
+
+    @Provides @Singleton
+    public BuildInfo provideBuildInfo() {
+      return new DataCollectorBuildInfo();
     }
 
     @Provides @Singleton
@@ -197,6 +204,11 @@ public class TestStandalonePipelineManager {
       return new SafeScheduledExecutorService(10, "manager");
     }
 
+    @Provides @Singleton @Named("supportBundleExecutor")
+    public SafeScheduledExecutorService provideSupportBundleExecutor() {
+      return new SafeScheduledExecutorService(1, "supportBundleExecutor");
+    }
+
     @Provides @Singleton
     public PreviewerProvider providePreviewerProvider() {
       return new PreviewerProvider() {
@@ -264,7 +276,7 @@ public class TestStandalonePipelineManager {
 
   @Test
   public void testPreviewer() throws PipelineException {
-    pipelineStoreTask.create("user", "abcd", "label","blah", false);
+    pipelineStoreTask.create("user", "abcd", "label","blah", false, false);
     Previewer previewer = pipelineManager.createPreviewer("user", "abcd", "0");
     assertEquals(previewer, pipelineManager.getPreviewer(previewer.getId()));
     ((StandaloneAndClusterPipelineManager)pipelineManager).outputRetrieved(previewer.getId());
@@ -285,20 +297,20 @@ public class TestStandalonePipelineManager {
 
   @Test
   public void testRunner() throws Exception {
-    pipelineStoreTask.create("user", "aaaa", "label","blah", false);
+    pipelineStoreTask.create("user", "aaaa", "label","blah", false, false);
     Runner runner = pipelineManager.getRunner("aaaa", "0");
     assertNotNull(runner);
   }
 
   @Test
   public void testGetPipelineStates() throws Exception {
-    pipelineStoreTask.create("user", "aaaa", "label","blah", false);
+    pipelineStoreTask.create("user", "aaaa", "label","blah", false, false);
     List<PipelineState> pipelineStates = pipelineManager.getPipelines();
 
     assertEquals("aaaa", pipelineStates.get(0).getPipelineId());
     assertEquals("0", pipelineStates.get(0).getRev());
 
-    pipelineStoreTask.create("user", "bbbb", "label","blah", false);
+    pipelineStoreTask.create("user", "bbbb", "label","blah", false, false);
     pipelineStates = pipelineManager.getPipelines();
     assertEquals(2, pipelineStates.size());
 
@@ -312,7 +324,7 @@ public class TestStandalonePipelineManager {
 
   @Test
   public void testRemotePipelineStartup() throws Exception {
-    pipelineStoreTask.create("user", "remote", "label","0", true);
+    pipelineStoreTask.create("user", "remote", "label","0", true, false);
     pipelineStateStore.saveState("user", "remote", "0", PipelineStatus.CONNECTING, "blah", null, ExecutionMode
             .STANDALONE,
         null, 0, 0);
@@ -347,7 +359,7 @@ public class TestStandalonePipelineManager {
 
   @Test
   public void testInitTask() throws Exception {
-    pipelineStoreTask.create("user", "aaaa", "label","blah", false);
+    pipelineStoreTask.create("user", "aaaa", "label","blah", false, false);
     pipelineStateStore.saveState("user", "aaaa", "0", PipelineStatus.CONNECTING, "blah", null, ExecutionMode.STANDALONE, null, 0, 0);
     pipelineManager.stop();
     pipelineStoreTask.stop();
@@ -379,7 +391,7 @@ public class TestStandalonePipelineManager {
 
   @Test
   public void testExpiry() throws Exception {
-    pipelineStoreTask.create("user", "aaaa", "label","blah", false);
+    pipelineStoreTask.create("user", "aaaa", "label","blah", false, false);
     Runner runner = pipelineManager.getRunner("aaaa", "0");
     pipelineStateStore.saveState("user", "aaaa", "0", PipelineStatus.RUNNING_ERROR, "blah", null, ExecutionMode.STANDALONE, null, 0, 0);
     assertEquals(PipelineStatus.RUNNING_ERROR, runner.getState().getStatus());
@@ -403,8 +415,8 @@ public class TestStandalonePipelineManager {
 
   @Test
   public void testPipelineRunnersAtDifferentTimesExpiry() throws Exception {
-    pipelineStoreTask.create("user", "aaaa", "label","blah", false);
-    pipelineStoreTask.create("user", "bbbb", "label","blah", false);
+    pipelineStoreTask.create("user", "aaaa", "label","blah", false, false);
+    pipelineStoreTask.create("user", "bbbb", "label","blah", false, false);
     setUpManager(100, 0, false);
 
     pipelineManager.getRunner("aaaa", "0");
@@ -435,7 +447,7 @@ public class TestStandalonePipelineManager {
 
   @Test
   public void testChangeExecutionModes() throws Exception {
-    pipelineStoreTask.create("user1", "pipeline2", "label","blah", false);
+    pipelineStoreTask.create("user1", "pipeline2", "label","blah", false, false);
     pipelineStateStore.saveState("user", "pipeline2", "0", PipelineStatus.EDITED, "blah", null, ExecutionMode.STANDALONE, null, 0, 0);
     Runner runner1 = pipelineManager.getRunner("pipeline2", "0");
     pipelineStateStore.saveState("user", "pipeline2", "0", PipelineStatus.EDITED, "blah", null, ExecutionMode.CLUSTER_BATCH, null, 0, 0);

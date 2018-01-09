@@ -44,6 +44,7 @@ import com.streamsets.datacollector.util.Configuration;
 import com.streamsets.pipeline.api.impl.Utils;
 import com.streamsets.datacollector.store.PipelineStoreTask;
 import com.streamsets.pipeline.lib.executor.SafeScheduledExecutorService;
+import org.apache.commons.lang3.ArrayUtils;
 import org.cloudera.log4j.redactor.StringRedactor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,11 +60,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
@@ -284,6 +287,25 @@ public class SupportBundleManager extends AbstractTask implements BundleContext 
     } finally {
       // Close the client
       s3Client.shutdown();
+    }
+  }
+
+  /**
+   * Try to upload bundle as part of internal SDC error (for example failing pipeline).
+   */
+  public void uploadNewBundleOnError() {
+    boolean enabled = configuration.get(Constants.UPLOAD_ON_ERROR, Constants.DEFAULT_UPLOAD_ON_ERROR);
+    LOG.info("Upload bundle on error: {}", enabled);
+
+    // We won't upload the bundle unless it's explicitly allowed
+    if(!enabled) {
+      return;
+    }
+
+    try {
+      uploadNewBundle(Collections.emptyList());
+    } catch (IOException e) {
+      LOG.error("Failed to upload error bundle", e);
     }
   }
 
@@ -551,7 +573,7 @@ public class SupportBundleManager extends AbstractTask implements BundleContext 
     @Override
     public JsonGenerator createGenerator(String fileName) throws IOException {
       markStartOfFile(fileName);
-      return new JsonFactory().createGenerator(new DelegateOutputStreamIgnoreClose(zipOutputStream));
+      return new JsonFactory().createGenerator(new JsonGeneratorOutputStream(zipOutputStream, redactor));
     }
 
     private void copyReader(BufferedReader reader, String path, long startOffset) throws IOException {
@@ -570,22 +592,41 @@ public class SupportBundleManager extends AbstractTask implements BundleContext 
     }
   }
 
-  private static class DelegateOutputStreamIgnoreClose extends OutputStream {
+  private static class JsonGeneratorOutputStream extends OutputStream {
 
-    ZipOutputStream zipOutputStream;
+    private final ArrayList<Byte> bytes;
+    private final ZipOutputStream zipOutputStream;
+    private final StringRedactor redactor;
 
-    public DelegateOutputStreamIgnoreClose(ZipOutputStream stream) {
+    public JsonGeneratorOutputStream(ZipOutputStream stream, StringRedactor redactor) {
+      this.bytes = new ArrayList<>();
       this.zipOutputStream = stream;
+      this.redactor = redactor;
     }
 
     @Override
     public void write(int b) throws IOException {
-      zipOutputStream.write(b);
+      // Add the byte to the line
+      bytes.add((byte)b);
+
+      // If it's final line, write the data out
+      if(b == '\n') {
+        writeOut();
+      }
+    }
+
+    private void writeOut() throws IOException {
+      byte[] byteLine = ArrayUtils.toPrimitive(bytes.toArray(new Byte[bytes.size()]));
+      String string = new String(byteLine, Charset.defaultCharset());
+      zipOutputStream.write(redactor.redact(string).getBytes());
+
+      bytes.clear();
     }
 
     @Override
     public void close() throws IOException {
-      // Nothing, we don't want the underlying stream to be closed
+      // Write down remaining bytes, but do not close the underlying zip stream
+      writeOut();
     }
   }
 }

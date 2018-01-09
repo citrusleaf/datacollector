@@ -548,15 +548,32 @@ public class HiveMetadataProcessor extends RecordProcessor {
             queryExecutor
         );
 
+        PartitionInfoCacheSupport.PartitionValues partitionValues = new PartitionInfoCacheSupport.PartitionValues(partitionValMap);
+
+        // If the partition information exist (thus this is not a cold start)
+        if(pCache != null) {
+          // If we detected drift, we need to persist that information and "roll" all partitions next time
+          // we will see them.
+          if (schemaDrift) {
+            pCache.setAllPartitionsToBeRolled();
+          }
+
+          // If we performed drift for the table and this is the firs time we see this partition, we need to
+          // set the roll flag anyway.
+          if (pCache.shouldRoll(partitionValues)) {
+            schemaDrift = true;
+          }
+        }
+
         // Append partition path to target path as all paths from now should be with the partition info
         targetPath += partitionStr;
 
-        Map<PartitionInfoCacheSupport.PartitionValues, String> diff = detectNewPartition(partitionValMap, pCache, targetPath);
+        Map<PartitionInfoCacheSupport.PartitionValues, String> diff = detectNewPartition(partitionValues, pCache, targetPath);
 
         // Send new partition metadata if new partition is detected.
         if (diff != null) {
           // Add custom metadata attributes if they are specified
-          Map<String, String> partitionMetadataHeaderAttributeMap = new LinkedHashMap();
+          Map<String, String> partitionMetadataHeaderAttributeMap = new LinkedHashMap<>();
           if (metadataHeadersToAddExist) {
             partitionMetadataHeaderAttributeMap = generateResolvedHeaderAttributeMap(metadataHeaderAttributeConfigs, variables);
           }
@@ -580,12 +597,12 @@ public class HiveMetadataProcessor extends RecordProcessor {
   }
 
   private void validateNames(String dbName, String tableName) throws HiveStageCheckedException {
-    if (!HiveMetastoreUtil.validateName(dbName)){
+    if (!HiveMetastoreUtil.validateObjectName(dbName)){
       throw new HiveStageCheckedException(Errors.HIVE_METADATA_03, HIVE_DB_NAME, dbName);
     }
     if (tableName.isEmpty()) {
       throw new HiveStageCheckedException(Errors.HIVE_METADATA_02, tableEL);
-    } else if (!HiveMetastoreUtil.validateName(tableName)){
+    } else if (!HiveMetastoreUtil.validateObjectName(tableName)){
       throw new HiveStageCheckedException(Errors.HIVE_METADATA_03, HIVE_TABLE_NAME, tableName);
     }
   }
@@ -655,19 +672,16 @@ public class HiveMetadataProcessor extends RecordProcessor {
   /**
    * Using partition name and value that were obtained from record, compare them
    * with cached partition.
-   * @param partitionValMap List of partition name and value found in Record
+   * @param partitionValues Partition representation
    * @param pCache  Cache that has existing partitions
    * @return Diff of partitions if new partition is detected. Otherwise null.
    * @throws StageException
    */
   private Map<PartitionInfoCacheSupport.PartitionValues, String> detectNewPartition(
-      LinkedHashMap<String, String> partitionValMap,
+      PartitionInfoCacheSupport.PartitionValues partitionValues,
       PartitionInfoCacheSupport.PartitionInfo pCache,
       String location
   ) throws StageException{
-    // Start evaluating partition value
-    PartitionInfoCacheSupport.PartitionValues partitionValues =
-        new PartitionInfoCacheSupport.PartitionValues(partitionValMap);
     Map<PartitionInfoCacheSupport.PartitionValues, String> partitionInfoDiff = new HashMap<>();
     partitionInfoDiff.put(partitionValues, location);
 

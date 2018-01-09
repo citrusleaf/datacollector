@@ -410,7 +410,7 @@ angular
 
               $timeout(function() {
                 $rootScope.common.successList.push({
-                  message: 'Successfully Published Pipeline to DPM Pipeline Repository: ' +
+                  message: 'Successfully Published Pipeline to SCH Pipeline Repository: ' +
                   authService.getRemoteBaseUrl() + ' New Pipeline Commit Version - ' + metadata['dpm.pipeline.version']
                 });
               });
@@ -447,6 +447,30 @@ angular
                 });
               });
             });
+      },
+
+      downloadEdgeExecutable: function () {
+        $scope.trackEvent(pipelineConstant.BUTTON_CATEGORY, pipelineConstant.CLICK_ACTION, 'Download Edge Executable', 1);
+        if ($scope.executionMode === 'EDGE') {
+          var modalInstance = $modal.open({
+            templateUrl: 'app/home/header/downloadExecutable/downloadExecutable.tpl.html',
+            controller: 'DownloadEdgeExecutableController',
+            size: '',
+            backdrop: 'static',
+            resolve: {
+              pipelineConfig: function () {
+                return $scope.pipelineConfig;
+              }
+            }
+          });
+        }
+      },
+
+      /**
+       * Returns true if pipeline is Edge pipeline
+       */
+      isEdgePipeline: function() {
+        return $scope.executionMode === 'EDGE'
       }
     });
 

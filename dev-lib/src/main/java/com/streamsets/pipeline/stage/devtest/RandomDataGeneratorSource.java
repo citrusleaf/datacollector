@@ -32,7 +32,6 @@ import com.streamsets.pipeline.api.lineage.EndPointType;
 import com.streamsets.pipeline.api.lineage.LineageEvent;
 import com.streamsets.pipeline.api.lineage.LineageEventType;
 import com.streamsets.pipeline.api.lineage.LineageSpecificAttribute;
-import com.streamsets.pipeline.config.TimeZoneChooserValues;
 import com.streamsets.pipeline.lib.util.ThreadUtil;
 import com.streamsets.pipeline.stage.common.HeaderAttributeConstants;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +73,7 @@ public class RandomDataGeneratorSource extends BasePushSource {
 
   private final int EVENT_VERSION = 1;
 
-  private final List<String> tzValues = new TimeZoneChooserValues().getValues();
+  private final List<String> tzValues = new ArrayList<>(ZoneId.getAvailableZoneIds());
 
   private final Random random = new Random();
 
@@ -175,24 +174,35 @@ public class RandomDataGeneratorSource extends BasePushSource {
     ExecutorService executor = Executors.newFixedThreadPool(numThreads);
     List<Future<Runnable>> futures = new ArrayList<>(numThreads);
 
-    // Run all the threads
-    for(int i = 0; i < numThreads; i++) {
-      Future future = executor.submit(new GeneratorRunnable(i));
-      futures.add(future);
-    }
+    StageException propagateException = null;
 
-    // Wait for proper execution finish
-    for(Future<Runnable> f : futures) {
-      try {
-        f.get();
-      } catch (InterruptedException|ExecutionException e) {
-        LOG.error("Interrupted data generation thread", e);
+    try {
+      // Run all the threads
+      for (int i = 0; i < numThreads; i++) {
+        Future future = executor.submit(new GeneratorRunnable(i));
+        futures.add(future);
       }
+
+      // Wait for proper execution finish
+      for (Future<Runnable> f : futures) {
+        try {
+          f.get();
+        } catch (InterruptedException | ExecutionException e) {
+          LOG.error("Interrupted data generation thread", e);
+          if(propagateException == null) {
+            propagateException = new StageException(Errors.DEV_001, e.toString(), e);
+          }
+        }
+      }
+    } finally {
+      // Terminate executor that will also clear up threads that were created
+      LOG.info("Shutting down executor service");
+      executor.shutdownNow();
     }
 
-    // Terminate executor that will also clear up threads that were created
-    LOG.info("Shutting down executor service");
-    executor.shutdownNow();
+    if(propagateException != null) {
+      throw propagateException;
+    }
   }
 
   public class GeneratorRunnable implements Runnable {
@@ -338,13 +348,13 @@ public class RandomDataGeneratorSource extends BasePushSource {
   }
 
   public ZonedDateTime getRandomZonedDateTime() {
-    String zoneId = tzValues.get(randBetween(0, tzValues.size()));
+    String zoneId = tzValues.get(randBetween(0, tzValues.size() - 1));
     return ZonedDateTime.of(
         randBetween(1990, 2020),
         randBetween(1, 12),
         randBetween(1, 28),
         randBetween(0, 23),
-        randBetween(0, 60),
+        randBetween(0, 59),
         0,
         0,
         ZoneId.of(zoneId));

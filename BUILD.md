@@ -44,6 +44,16 @@ and
 
 `mvn clean install -DskipTests`
 
+Also you need to have datacollector-edge to be installed into your local maven repository.
+
+- First get the latest version of the datacollector-edge from Github
+
+ `git clone https://github.com/streamsets/datacollector-edge.git`
+
+- Gradle is used in this project as a build tool, so in order to install it to your local maven repository execute:
+
+  `./gradlew clean release`
+
 Follow these instructions to build the Data Collector :
 
 - Get the latest code from Github
@@ -58,11 +68,11 @@ From within the Data Collector directory, execute:
 
 To start the Data Collector, execute:
 
-`dist/target/streamsets-datacollector-3.0.0.0-SNAPSHOT/streamsets-datacollector-3.0.0.0-SNAPSHOT/bin/streamsets dc`
+`dist/target/streamsets-datacollector-3.1.0.0-SNAPSHOT/streamsets-datacollector-3.1.0.0-SNAPSHOT/bin/streamsets dc`
 
 For Data Collector CLI, execute:
 
-`dist/target/streamsets-datacollector-3.0.0.0-SNAPSHOT/streamsets-datacollector-3.0.0.0-SNAPSHOT/bin/streamsets cli`
+`dist/target/streamsets-datacollector-3.1.0.0-SNAPSHOT/streamsets-datacollector-3.1.0.0-SNAPSHOT/bin/streamsets cli`
 
 To skip the RAT report during the build use the `-DskipRat` option.
 
@@ -74,12 +84,12 @@ From within the Data Collector directory, execute:
 
 The release tarball will be created at:
 
-`release/target/streamsets-datacollector-all-3.0.0.0-SNAPSHOT.tgz`
+`release/target/streamsets-datacollector-all-3.1.0.0-SNAPSHOT.tgz`
 
 Extract the tarball to your preferred location :
 
-`tar xf streamsets-datacollector-all-3.0.0.0-SNAPSHOT.tgz`
+`tar xf streamsets-datacollector-all-3.1.0.0-SNAPSHOT.tgz`
 
 To start the DataCollector, execute:
 
-`streamsets-datacollector-all-3.0.0.0-SNAPSHOT/bin/streamsets dc`
+`streamsets-datacollector-all-3.1.0.0-SNAPSHOT/bin/streamsets dc`

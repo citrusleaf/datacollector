@@ -55,7 +55,7 @@ public class TestHttpServerPushSource {
     HttpServerPushSource source =
         new HttpServerPushSource(httpConfigs, 1, DataFormat.TEXT, new DataParserFormatConfig());
     final PushSourceRunner runner =
-        new PushSourceRunner.Builder(HttpServerPushSource.class, source).addOutputLane("a").build();
+        new PushSourceRunner.Builder(HttpServerDPushSource.class, source).addOutputLane("a").build();
     runner.runInit();
     try {
       final List<Record> records = new ArrayList<>();
@@ -73,12 +73,17 @@ public class TestHttpServerPushSource {
       connection.setUseCaches(false);
       connection.setDoOutput(true);
       connection.setRequestProperty(Constants.X_SDC_APPLICATION_ID_HEADER, "id");
+      connection.setRequestProperty("customHeader", "customHeaderValue");
       connection.getOutputStream().write("Hello".getBytes());
       Assert.assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
       runner.waitOnProduce();
       Assert.assertEquals(1, records.size());
       Assert.assertEquals("Hello", records.get(0).get("/text").getValue());
-
+      Assert.assertEquals(
+          "id",
+          records.get(0).getHeader().getAttribute(Constants.X_SDC_APPLICATION_ID_HEADER)
+      );
+      Assert.assertEquals("customHeaderValue", records.get(0).getHeader().getAttribute("customHeader"));
 
       // passing App Id via query param should fail when appIdViaQueryParamAllowed is false
       String url = "http://localhost:" + httpConfigs.getPort() +
@@ -106,7 +111,7 @@ public class TestHttpServerPushSource {
     HttpServerPushSource source =
         new HttpServerPushSource(httpConfigs, 1, DataFormat.TEXT, new DataParserFormatConfig());
     final PushSourceRunner runner =
-        new PushSourceRunner.Builder(HttpServerPushSource.class, source).addOutputLane("a").build();
+        new PushSourceRunner.Builder(HttpServerDPushSource.class, source).addOutputLane("a").build();
     runner.runInit();
     try {
       final List<Record> records = new ArrayList<>();
@@ -158,7 +163,7 @@ public class TestHttpServerPushSource {
     HttpServerPushSource source =
             new HttpServerPushSource(httpConfigs, 1, DataFormat.AVRO, dataFormatConfig);
     final PushSourceRunner runner =
-            new PushSourceRunner.Builder(HttpServerPushSource.class, source).addOutputLane("a").build();
+            new PushSourceRunner.Builder(HttpServerDPushSource.class, source).addOutputLane("a").build();
     runner.runInit();
     try {
       final List<Record> records = new ArrayList<>();

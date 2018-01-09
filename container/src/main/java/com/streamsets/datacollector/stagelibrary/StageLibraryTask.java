@@ -15,10 +15,12 @@
  */
 package com.streamsets.datacollector.stagelibrary;
 
+import com.streamsets.datacollector.classpath.ClasspathValidatorResult;
 import com.streamsets.datacollector.config.CredentialStoreDefinition;
 import com.streamsets.datacollector.config.LineagePublisherDefinition;
 import com.streamsets.datacollector.config.PipelineDefinition;
 import com.streamsets.datacollector.config.PipelineRulesDefinition;
+import com.streamsets.datacollector.config.ServiceDefinition;
 import com.streamsets.datacollector.config.StageDefinition;
 import com.streamsets.datacollector.task.Task;
 import com.streamsets.pipeline.api.impl.annotationsprocessor.PipelineAnnotationsProcessor;
@@ -36,6 +38,8 @@ public interface StageLibraryTask extends Task, ClassLoaderReleaser {
 
   public static final String CREDENTIAL_STORE_DEFINITION_RESOURCE = PipelineAnnotationsProcessor.CREDENTIAL_STORE_FILE;
 
+  public static final String SERVICE_DEFINITION_RESOURCE = PipelineAnnotationsProcessor.SERVICES_FILE;
+
   public PipelineDefinition getPipeline();
 
   public PipelineRulesDefinition getPipelineRules();
@@ -48,10 +52,16 @@ public interface StageLibraryTask extends Task, ClassLoaderReleaser {
 
   public List<CredentialStoreDefinition> getCredentialStoreDefinitions();
 
+  public List<ServiceDefinition> getServiceDefinitions();
+
+  public ServiceDefinition getServiceDefinition(Class serviceInterface, boolean forExecution);
+
   public StageDefinition getStage(String library, String name, boolean forExecution);
 
   public Map<String, String> getLibraryNameAliases();
 
   public Map<String, String> getStageNameAliases();
+
+  public List<ClasspathValidatorResult> validateStageLibClasspath();
 
 }

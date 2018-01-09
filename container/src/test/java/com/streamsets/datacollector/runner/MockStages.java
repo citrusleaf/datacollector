@@ -16,6 +16,7 @@
 package com.streamsets.datacollector.runner;
 
 import com.google.common.collect.ImmutableList;
+import com.streamsets.datacollector.classpath.ClasspathValidatorResult;
 import com.streamsets.datacollector.cluster.ClusterModeConstants;
 import com.streamsets.datacollector.config.ConfigDefinition;
 import com.streamsets.datacollector.config.CredentialStoreDefinition;
@@ -26,6 +27,7 @@ import com.streamsets.datacollector.config.PipelineConfiguration;
 import com.streamsets.datacollector.config.PipelineDefinition;
 import com.streamsets.datacollector.config.PipelineRulesDefinition;
 import com.streamsets.datacollector.config.RawSourceDefinition;
+import com.streamsets.datacollector.config.ServiceDefinition;
 import com.streamsets.datacollector.config.StageConfiguration;
 import com.streamsets.datacollector.config.StageDefinition;
 import com.streamsets.datacollector.creation.PipelineConfigBean;
@@ -680,6 +682,16 @@ public class MockStages {
     }
 
     @Override
+    public List<ServiceDefinition> getServiceDefinitions() {
+      return Collections.emptyList();
+    }
+
+    @Override
+    public ServiceDefinition getServiceDefinition(Class serviceInterface, boolean forExecution) {
+      return null;
+    }
+
+    @Override
     public StageDefinition getStage(String library, String name, boolean forExecution) {
       for (StageDefinition def : stages) {
         if (def.getLibrary().equals(library) && def.getName().equals(name)) {
@@ -697,6 +709,11 @@ public class MockStages {
     @Override
     public Map<String, String> getStageNameAliases() {
       return Collections.emptyMap();
+    }
+
+    @Override
+    public List<ClasspathValidatorResult> validateStageLibClasspath() {
+      return Collections.emptyList();
     }
 
     @Override
@@ -742,7 +759,7 @@ public class MockStages {
           .build();
 
         ModelDefinition m = new ModelDefinition(ModelType.FIELD_SELECTOR_MULTI_VALUE, null, Collections.<String>emptyList(),
-          Collections.<String>emptyList(), null, null);
+          Collections.<String>emptyList(), null, null, null);
         ConfigDefinition stageReqField = new ConfigDefinition("stageRequiredFields", ConfigDef.Type.MODEL, "stageRequiredFields",
           "stageRequiredFields", null, false, "groupName", "stageRequiredFieldName", m, "", null, 0, Collections.<ElFunctionDefinition>emptyList(),
           Collections.<ElConstantDefinition>emptyList(), Long.MIN_VALUE, Long.MAX_VALUE, "text/plain", 0, Collections.<Class> emptyList(),
@@ -863,7 +880,7 @@ public class MockStages {
         List<ConfigDefinition> list = new ArrayList<>();
         list.add(regularConf);
         ModelDefinition modelDefinition = new ModelDefinition(ModelType.LIST_BEAN, null, Collections.<String>emptyList(),
-          Collections.<String>emptyList(), null, list);
+          Collections.<String>emptyList(), null, list, null);
 
         ConfigDefinition complexConf = new ConfigDefinition(
           "complexConfName", ConfigDef.Type.MODEL, "complexConfLabel", "complexConfDesc", null, true,
@@ -954,7 +971,8 @@ public class MockStages {
               false,
               false,
               false,
-              false
+              false,
+              Collections.emptyList()
           );
           stages.put(name, newDef);
         } else {

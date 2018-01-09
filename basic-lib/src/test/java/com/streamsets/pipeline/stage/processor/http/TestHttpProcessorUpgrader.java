@@ -17,6 +17,7 @@ package com.streamsets.pipeline.stage.processor.http;
 
 import com.google.common.collect.ImmutableList;
 import com.streamsets.pipeline.api.Config;
+import com.streamsets.pipeline.config.upgrade.UpgraderTestUtils;
 import com.streamsets.pipeline.lib.http.AuthenticationType;
 import com.streamsets.pipeline.lib.http.HttpProxyConfigBean;
 import com.streamsets.pipeline.lib.http.OAuthConfigBean;
@@ -137,6 +138,22 @@ public class TestHttpProcessorUpgrader {
         "conf.client.",
         new HttpProcessorUpgrader(),
         9
+    );
+  }
+
+  @Test
+  public void testV10ToV11() throws Exception {
+    List<Config> configs = new ArrayList<>();
+
+    HttpProcessorUpgrader upgrader = new HttpProcessorUpgrader();
+    upgrader.upgrade("lib", "stage", "inst", 10, 11, configs);
+
+    UpgraderTestUtils.assertAllExist(
+        configs,
+        "conf.client.requestLoggingConfig.enableRequestLogging",
+        "conf.client.requestLoggingConfig.logLevel",
+        "conf.client.requestLoggingConfig.verbosity",
+        "conf.client.requestLoggingConfig.maxEntitySize"
     );
   }
 }

@@ -57,6 +57,7 @@ angular.module('dataCollectorApp.common')
             self.pipelineConfigDefinition = definitions.pipeline[0];
             self.pipelineRulesConfigDefinition = definitions.pipelineRules[0];
             self.stageDefinitions = definitions.stages;
+            self.serviceDefinitions = definitions.services;
             self.elCatalog = definitions.elCatalog;
 
             //General Rules
@@ -140,7 +141,7 @@ angular.module('dataCollectorApp.common')
     };
 
     /**
-     * Returns true if DPM Statistics library installed otherwise false
+     * Returns true if SCH Statistics library installed otherwise false
      */
     this.isDPMStatisticsLibraryInstalled = function() {
       var statsLibraryDefn = _.find(self.stageDefinitions, function (stage) {
@@ -177,6 +178,29 @@ angular.module('dataCollectorApp.common')
       return self.stageDefinitions;
     };
 
+    /**
+     * Returns Service Definitions
+     *
+     * @returns {*|serviceDefinitions}
+     */
+    this.getServiceDefinitions = function() {
+      return self.serviceDefinitions;
+    };
+
+    /**
+     * Returns Service Definition for given service
+     *
+     * @returns {*|serviceDefinition}
+     */
+    this.getServiceDefinition = function(serviceName) {
+      var serviceDef = null;
+      angular.forEach(self.getServiceDefinitions(), function(serviceDefinition) {
+        if (serviceDefinition.provides == serviceName) {
+          serviceDef = serviceDefinition;
+        }
+      });
+      return serviceDef;
+    };
     /**
      * Returns General Rules EL Metadata
      *
@@ -578,6 +602,7 @@ angular.module('dataCollectorApp.common')
           yPos: yPos,
           stageType: stage.type
         },
+        services: [],
         inputLanes: [],
         outputLanes: [],
         eventLanes: []
@@ -660,6 +685,35 @@ angular.module('dataCollectorApp.common')
         stageInstance.configuration = configuration;
       }
 
+      // Initialize structure for all dependent services
+      angular.forEach(stage.services, function(serviceDependency) {
+        // Find service definition for this particular service
+        var serviceDef = self.getServiceDefinition(serviceDependency.service);
+
+        // Crate service instance
+        var serviceInstance = {};
+        serviceInstance.service = serviceDef.provides;
+        serviceInstance.serviceVersion = serviceDef.version;
+        serviceInstance.configuration = [];
+        angular.forEach(serviceDef.configDefinitions, function(configDefinition) {
+          // We're passing null for stageInstance as that should be used only for calculating output lane
+          // name, which is operation that does not make sense for service.
+          serviceInstance.configuration.push(self.setDefaultValueForConfig(configDefinition, null));
+        });
+
+        // Propagate RUNTIME configuration injected by the stage
+        angular.forEach(serviceDependency.configuration, function(value, key) {
+          angular.forEach(serviceInstance.configuration, function(config) {
+            if(config.name == key) {
+              config.value = value;
+            }
+          });
+        });
+
+        // And finally push it to the stage definition
+        stageInstance.services.push(serviceInstance);
+      });
+
       return stageInstance;
     };
 
@@ -700,7 +754,7 @@ angular.module('dataCollectorApp.common')
      * @returns {*}
      */
     this.getStageInstanceName = function(stage, pipelineConfig, options) {
-      var stageName = stage.label.replace(/ /g, '');
+      var stageName = stage.label.replace(/ /g, '').replace(/\//g, '');
 
       if (options.errorStage) {
         return stageName + '_ErrorStage';
@@ -1114,11 +1168,11 @@ angular.module('dataCollectorApp.common')
      * @param pipelineConfig
      */
     this.autoArrange = function(pipelineConfig) {
-      var xPos = 60,
-        yPos = 50,
-        stages = pipelineConfig.stages,
-        laneYPos = {},
-        laneXPos = {};
+      var xPos = 60;
+      var yPos = 50;
+      var stages = pipelineConfig.stages;
+      var laneYPos = {};
+      var laneXPos = {};
 
       angular.forEach(stages, function(stage) {
         var y = stage.inputLanes.length ? laneYPos[stage.inputLanes[0]]: yPos,

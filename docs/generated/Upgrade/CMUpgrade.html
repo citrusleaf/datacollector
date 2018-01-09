@@ -53,6 +53,10 @@ To upgrade <span class="ph">Data
 
             <p class="p"><a class="xref" href="CMUpgrade.html#task_mdr_phr_5v" title="After you add the StreamSets repository to Cloudera Manager, you can download and distribute the new StreamSets parcel across the cluster. Stop the StreamSets service and deactivate the previous parcel before you activate the new parcel.">Step 5. Distribute and Activate the New StreamSets Parcel</a></p>
 
+        <p class="p"><a class="xref" href="CMUpgrade.html#concept_icd_wt4_2cb" title="When you upgrade, Cloudera Manager updates the Data Collector configuration properties for you. However, if you modified any of the Advanced Configuration Snippet (Safety Valve) properties in Cloudera Manager for the previous Data Collector version, those values override any property settings in the new configuration files.">Step 6. Verify Modified Safety Valves</a></p>
+
+        <p class="p"><a class="xref" href="CMUpgrade.html#concept_kdx_llp_2cb" title="When you restart the StreamSets service, Cloudera Manager updates the Data Collector configuration properties for you. Cloudera Manager retains any customized values that you added in the previous Data Collector version. It also adds any new properties included in the new Data Collector version.">Step 7. Restart the StreamSets Service</a></p>
+
         
         <div class="note warning"><span class="warningtitle">Warning:</span> You must perform the steps in this order, or <span class="ph">Data
                   Collector</span>
@@ -106,9 +110,9 @@ To upgrade <span class="ph">Data
 
         </div>
 
-        <p class="p">For example, if you are upgrading version 2.6.0.0, copy the <span class="ph">Data
+        <p class="p">For example, if you are upgrading version 2.7.0.0, copy the <span class="ph">Data
                   Collector</span>
-            configuration directory and rename it as follows: <samp class="ph codeph">/etc/sdc2600</samp>.</p>
+            configuration directory and rename it as follows: <samp class="ph codeph">/etc/sdc2700</samp>.</p>
 
         <p class="p">If you need to roll back to the previous version, you must restore the previous
             directories on every Cloudera Manager node that runs <span class="ph">Data
@@ -117,7 +121,7 @@ To upgrade <span class="ph">Data
  </div>
 
     <div class="related-links"><div class="relinfo relconcepts"><strong>Related concepts</strong><br />
-<div class="related_link"><a class="navheader_parent_path" href="../Configuration/DCEnvironmentConfig.html#concept_rng_qym_qr" title="You can edit the Data Collector environment configuration file to modify the directories used to store configuration, data, log, and resource files.When you run Data Collector as a service, Data Collector runs as the system user account and group defined in the SDC_USER and SDC_GROUP environment variables. The default system user and group are named sdc.Increase or decrease the Data Collector Java heap size as necessary, based on the resources available on the host machine. By default, the Java heap size is 1024 MB. You can enable remote debugging to debug a Data Collector instance running on a remote machine. You can define the Java garbage collector that Data Collector uses. By default, Data Collector uses the Concurrent Mark Sweep (CMS) garbage collector.Data Collector includes a Java Security Manager that is enabled by default. You can edit the Data Collector environment configuration file to configure the path to JAR files to be added to the Data Collector root classloader.">Data Collector Environment Configuration</a></div>
+<div class="related_link"><a class="navheader_parent_path" href="../Configuration/DCEnvironmentConfig.html#concept_rng_qym_qr" title="You can edit the Data Collector environment configuration file to modify the directories used to store configuration, data, log, and resource files.When you run Data Collector as a service, Data Collector runs as the system user account and group defined in environment variables. The default system user and group are named sdc.Increase or decrease the Data Collector Java heap size as necessary, based on the resources available on the host machine. By default, the Java heap size is 1024 MB. You can enable remote debugging to debug a Data Collector instance running on a remote machine. You can define the Java garbage collector that Data Collector uses. By default, Data Collector uses the Concurrent Mark Sweep (CMS) garbage collector.Data Collector includes a Java Security Manager that is enabled by default. You can edit the Data Collector environment configuration file to configure the path to JAR files to be added to the Data Collector root classloader.">Data Collector Environment Configuration</a></div>
 </div>
 </div>
 </div>
@@ -155,11 +159,11 @@ chmod 644 /opt/cloudera/csd/STREAMSETS*.jar</pre>
             </li>
 <li class="li step stepexpand">
                 <span class="ph cmd">Use one of the following commands to restart Cloudera Manager Server:</span>
-                <div class="itemgroup info"><div class="p">For Ubuntu 14.04, CentOS 6, or RedHat Enterprise Linux 6:
+                <div class="itemgroup info"><div class="p">For Ubuntu 14.04, CentOS 6, or Red Hat Enterprise Linux 6:
                         <pre class="pre codeblock">service cloudera-scm-server restart</pre>
 </div>
 For Ubuntu
-                    16.04, CentOS 7, or RedHat Enterprise Linux 7:
+                    16.04, CentOS 7, or Red Hat Enterprise Linux 7:
                     <pre class="pre codeblock">systemctl restart cloudera-scm-server</pre>
 </div>
             </li>
@@ -253,17 +257,51 @@ For Ubuntu
                     Location selector, and then click <span class="ph uicontrol">Activate</span> for the
                     parcel.</span>
             </li>
-<li class="li step stepexpand">
-                <span class="ph cmd">To restart the StreamSets service, click <span class="ph menucascade"><span class="ph uicontrol">Clusters</span> &gt; <span class="ph uicontrol">StreamSets</span></span> and then click <span class="ph menucascade"><span class="ph uicontrol">Actions</span> &gt; <span class="ph uicontrol">Start</span></span>.</span>
-                <div class="itemgroup info"> When you restart the StreamSets service, Cloudera Manager updates the <span class="ph">Data
-                  Collector</span> configuration properties for you. Cloudera Manager retains any customized
-                    values that you added in the previous <span class="ph">Data
-                  Collector</span> version. It also adds any new properties included in the new <span class="ph">Data
-                  Collector</span> version. </div>
-            </li>
 </ol>
 
     </div>
+
+</div>
+<div class="topic concept nested1" id="concept_icd_wt4_2cb">
+ <h2 class="title topictitle2">Step 6. Verify Modified Safety Valves</h2>
+
+ 
+ <div class="body conbody"><p class="shortdesc">When you upgrade, Cloudera Manager updates the <span class="ph">Data
+                  Collector</span>
+        configuration properties for you. However, if you modified any of the <span class="ph uicontrol">Advanced
+            Configuration Snippet (Safety Valve) properties</span> in Cloudera Manager for the
+        previous <span class="ph">Data
+                  Collector</span> version, those values override any property settings in the new configuration files. </p>
+
+  <p class="p">You must compare the new configuration files shipped with the parcel in
+                <samp class="ph codeph">/opt/cloudera/parcels/STREAMSETS</samp> with your modified safety valves
+            and update the safety valves as needed to include any new properties.</p>
+
+        <p class="p">For example, if you used the <span class="ph uicontrol">Data Collector Advanced Configuration Snippet
+                (Safety Valve) for sdc.properties</span> to override the
+                <samp class="ph codeph">system.stagelibs.blacklist</samp> property, you must add any new stage
+            libraries listed in the blacklist property in the new <samp class="ph codeph">sdc.properties</samp>
+            file to the overridden property in the safety valve.</p>
+
+ </div>
+
+</div>
+<div class="topic concept nested1" id="concept_kdx_llp_2cb">
+ <h2 class="title topictitle2">Step 7. Restart the StreamSets Service</h2>
+
+ 
+ <div class="body conbody"><p class="shortdesc">When you restart the StreamSets service, Cloudera Manager updates the <span class="ph">Data
+                  Collector</span>
+        configuration properties for you. Cloudera Manager retains any customized values that you
+        added in the previous <span class="ph">Data
+                  Collector</span>
+        version. It also adds any new properties included in the new <span class="ph">Data
+                  Collector</span>
+        version. </p>
+
+  <p class="p">To restart the StreamSets service, click <span class="ph menucascade"><span class="ph uicontrol">Clusters</span> &gt; <span class="ph uicontrol">StreamSets</span></span> and then click <span class="ph menucascade"><span class="ph uicontrol">Actions</span> &gt; <span class="ph uicontrol">Start</span></span>.</p>
+
+ </div>
 
 </div>
 </div>

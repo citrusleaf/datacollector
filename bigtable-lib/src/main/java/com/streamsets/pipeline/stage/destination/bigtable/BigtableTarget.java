@@ -25,7 +25,6 @@ import com.streamsets.pipeline.api.base.OnRecordErrorException;
 import com.streamsets.pipeline.lib.parser.shaded.com.google.code.regexp.Pattern;
 import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
@@ -534,11 +533,13 @@ public class BigtableTarget extends BaseTarget {
       Put put = new Put(rowKey, timeStamp);
 
       for (BigtableFieldMapping f : conf.fieldColumnMapping) {
-        theList.add(put.addColumn(destinationNames.get(f.column).columnFamily,
-            destinationNames.get(f.column).qualifier,
-            timeStamp,
-            values.get(f.source)
-        ));
+        if (values.containsKey(f.source)) {
+          theList.add(put.addColumn(destinationNames.get(f.column).columnFamily,
+              destinationNames.get(f.column).qualifier,
+              timeStamp,
+              values.get(f.source)
+          ));
+        }
       }
 
       counter++;

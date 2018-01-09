@@ -57,17 +57,20 @@
 </div>
 </div>
 <div class="topic concept nested1" id="concept_kgc_l4y_5r">
- <h2 class="title topictitle2">Pipeline Error Record Handling</h2>
+  <h2 class="title topictitle2">Pipeline Error Record Handling</h2>
 
- <div class="body conbody">
-  <p class="p">Pipeline error
+  <div class="body conbody">
+    <p class="p">Pipeline error
       record handling determines how <span class="ph">Data
                   Collector</span> processes
       error records that stages send to the pipeline for error handling. It also handles records
       deliberately dropped from the pipeline such as records without required fields.</p>
 
-    <div class="p">The pipeline handles error records based on the Error Records property on the Error Records
-      tab. The pipeline provides the following error record handling options:<dl class="dl">
+    <p class="p">The pipeline handles error records based on the Error Records property on the Error Records
+      tab. When <span class="ph">Data
+                  Collector</span> encounters an unexpected error, it stops the pipeline and logs the error.</p>
+
+    <div class="p"> The pipeline provides the following error record handling options:<dl class="dl">
         
           <dt class="dt dlterm">Discard</dt>
 
@@ -119,6 +122,26 @@
 
         
         
+          <dt class="dt dlterm">Write to Google Cloud Storage</dt>
+
+          <dd class="dd">The pipeline writes error records and related details to Google Cloud Storage. <span class="ph">Data
+                  Collector</span>
+            includes the records in error record counts and metrics.</dd>
+
+          <dd class="dd">You define the Google Cloud Storage configuration properties. </dd>
+
+        
+        
+          <dt class="dt dlterm">Write to Google Sub/Pub</dt>
+
+          <dd class="dd">The pipeline writes error records and related details to Google Sub/Pub. <span class="ph">Data
+                  Collector</span>
+            includes the records in error record counts and metrics.</dd>
+
+          <dd class="dd">You define the Google Sub/Pub configuration properties. </dd>
+
+        
+        
           <dt class="dt dlterm">Write to Kafka</dt>
 
           <dd class="dd">The pipeline writes error records and related details to Kafka. <span class="ph">Data
@@ -145,17 +168,23 @@
                   Collector</span>
             includes the records in error record counts and metrics.</dd>
 
-          <dd class="dd">You define the configuration properties for the MapR Streams to use. </dd>
+          <dd class="dd">You define the configuration properties for the MapR Streams cluster to use. </dd>
+
+        
+        
+          <dt class="dt dlterm">Write to MQTT</dt>
+
+          <dd class="dd">The pipeline writes error records and related details to an MQTT broker. <span class="ph">Data
+                  Collector</span>
+            includes the records in error record counts and metrics.</dd>
+
+          <dd class="dd">You define the configuration properties for the MQTT broker to use. </dd>
 
         
       </dl>
 </div>
 
-  <p class="p">When <span class="ph">Data
-                  Collector</span>
-      encounters an unexpected error, it stops the pipeline and logs the error.</p>
-
- </div>
+  </div>
 
 </div>
 <div class="topic concept nested1" id="concept_atr_j4y_5r">
@@ -174,8 +203,8 @@
           <dd class="dd">The stage silently discards the record. <span class="ph">Data
                   Collector</span> does
             not log information about the error or note the specific record that encountered an
-            error. The discarded record is not included in Monitor mode error record counts or
-            metrics. </dd>
+            error. The discarded record is not included in <span class="ph">Monitor mode </span>error
+            record counts or metrics. </dd>
 
         
         
@@ -184,9 +213,9 @@
           <dd class="dd">The stage sends the record to the pipeline for error handling. The pipeline processes
             the record based on the pipeline error handling configuration.</dd>
 
-          <dd class="dd">When you monitor the pipeline, you can view the most recent error records and the
-            issues they encountered on the Error Records tab for the stage. This information becomes
-            unavailable after you stop the pipeline. </dd>
+          <dd class="dd">When you monitor the pipeline, you can view the most recent error
+            records and the issues they encountered on the Error Records tab for the stage. This
+            information becomes unavailable after you stop the pipeline. </dd>
 
         
         
@@ -195,7 +224,8 @@
           <dd class="dd"><span class="ph">Data
                   Collector</span>
             stops the pipeline and logs information about the error. The error that stopped the
-            pipeline displays as an alert in Monitor mode and as an error in the pipeline history. </dd>
+            pipeline displays <span class="ph">as an alert in Monitor mode and </span>as an error in
+            the pipeline history. </dd>
 
           <dd class="dd">Stop pipeline is not supported for cluster mode pipelines at this time.</dd>
 
@@ -220,16 +250,16 @@
    based on how you configure the pipeline error handling: <ul class="ul" id="concept_y4z_n4y_5r__ul_a3h_mjy_5r">
     <li class="li">When the pipeline discards error records, <span class="ph">Data
                   Collector</span>
-          discards the record without noting the action or the cause. <p class="p">When you monitor the
-            pipeline, you can view the most recent set of error records and information about the
-            errors on the Error Records tab for the stage. But this information becomes unavailable
-            after you stop the pipeline. </p>
+          discards the record without noting the action or the cause. <p class="p">When you
+            monitor the pipeline, you can view the most recent set of error records and information
+            about the errors on the Error Records tab for the stage. But this information becomes
+            unavailable after you stop the pipeline. </p>
 </li>
 
     <li class="li">When the pipeline writes error records to a destination, <span class="ph">Data
                   Collector</span> writes
           the error record and additional error information to the destination. It also includes the
-          error records in monitor counts and metrics. </li>
+          error records in <span class="ph">monitor </span>counts and metrics. </li>
 
    </ul>
 </div>

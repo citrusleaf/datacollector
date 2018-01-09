@@ -15,11 +15,13 @@
  */
 package com.streamsets.datacollector.runner.preview;
 
+import com.streamsets.datacollector.classpath.ClasspathValidatorResult;
 import com.streamsets.datacollector.config.ConfigDefinition;
 import com.streamsets.datacollector.config.CredentialStoreDefinition;
 import com.streamsets.datacollector.config.LineagePublisherDefinition;
 import com.streamsets.datacollector.config.PipelineDefinition;
 import com.streamsets.datacollector.config.PipelineRulesDefinition;
+import com.streamsets.datacollector.config.ServiceDefinition;
 import com.streamsets.datacollector.config.StageDefinition;
 import com.streamsets.datacollector.config.StageLibraryDefinition;
 import com.streamsets.datacollector.config.StageType;
@@ -70,7 +72,8 @@ public class PreviewStageLibraryTask extends TaskWrapper implements StageLibrary
       false,
       false,
       false,
-      false
+      false,
+      Collections.emptyList()
   );
 
   private final StageLibraryTask library;
@@ -97,17 +100,27 @@ public class PreviewStageLibraryTask extends TaskWrapper implements StageLibrary
 
   @Override
   public List<LineagePublisherDefinition> getLineagePublisherDefinitions() {
-    return Collections.emptyList();
+    return library.getLineagePublisherDefinitions();
   }
 
   @Override
   public LineagePublisherDefinition getLineagePublisherDefinition(String library, String name) {
-    return null;
+    return this.library.getLineagePublisherDefinition(library, name);
   }
 
   @Override
   public List<CredentialStoreDefinition> getCredentialStoreDefinitions() {
-    return Collections.emptyList();
+    return library.getCredentialStoreDefinitions();
+  }
+
+  @Override
+  public List<ServiceDefinition> getServiceDefinitions() {
+    return library.getServiceDefinitions();
+  }
+
+  @Override
+  public ServiceDefinition getServiceDefinition(Class serviceInterface, boolean forExecution) {
+    return library.getServiceDefinition(serviceInterface, forExecution);
   }
 
   @Override
@@ -129,6 +142,11 @@ public class PreviewStageLibraryTask extends TaskWrapper implements StageLibrary
   @Override
   public Map<String, String> getStageNameAliases() {
     return library.getStageNameAliases();
+  }
+
+  @Override
+  public List<ClasspathValidatorResult> validateStageLibClasspath() {
+    return library.validateStageLibClasspath();
   }
 
   @Override

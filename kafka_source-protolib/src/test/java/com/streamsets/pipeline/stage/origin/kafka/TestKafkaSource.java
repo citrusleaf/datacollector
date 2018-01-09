@@ -131,11 +131,12 @@ public class TestKafkaSource {
 
   private static File tempDir;
   private static File protoDescFile;
-  private static final SdcKafkaTestUtil sdcKafkaTestUtil = SdcKafkaTestUtilFactory.getInstance().create();
+  private static SdcKafkaTestUtil sdcKafkaTestUtil;
 
 
   @BeforeClass
   public static void setUp() throws IOException, InterruptedException {
+    sdcKafkaTestUtil = SdcKafkaTestUtilFactory.getInstance().create();
     sdcKafkaTestUtil.startZookeeper();
     sdcKafkaTestUtil.startKafkaBrokers(3);
 
@@ -219,7 +220,7 @@ public class TestKafkaSource {
 
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC1, SINGLE_PARTITION, producer, startLatch, DataType.TEXT, null, -1,
-      null));
+      null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -234,7 +235,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.removeCtrlChars = false;
     conf.dataFormatConfig.textMaxLineLen = 4096;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
     sourceRunner.runInit();
@@ -278,7 +279,7 @@ public class TestKafkaSource {
 
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC2, MULTIPLE_PARTITIONS, producer, startProducing, DataType.TEXT,
-      null, -1, null));
+      null, -1, null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -293,7 +294,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.removeCtrlChars = false;
     conf.dataFormatConfig.textMaxLineLen = 4096;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -325,7 +326,7 @@ public class TestKafkaSource {
     CountDownLatch startLatch = new CountDownLatch(1);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC3, SINGLE_PARTITION, producer, startLatch, DataType.JSON,
-      Mode.MULTIPLE_OBJECTS, -1, null));
+      Mode.MULTIPLE_OBJECTS, -1, null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -341,7 +342,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.jsonContent = JsonMode.MULTIPLE_OBJECTS;
     conf.dataFormatConfig.jsonMaxObjectLen = 4096;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -367,7 +368,7 @@ public class TestKafkaSource {
     CountDownLatch startLatch = new CountDownLatch(1);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC4, SINGLE_PARTITION, producer, startLatch, DataType.JSON,
-      Mode.MULTIPLE_OBJECTS, -1, null));
+      Mode.MULTIPLE_OBJECTS, -1, null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -383,7 +384,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.jsonContent = JsonMode.MULTIPLE_OBJECTS;
     conf.dataFormatConfig.jsonMaxObjectLen = 4096;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -408,7 +409,7 @@ public class TestKafkaSource {
     CountDownLatch startLatch = new CountDownLatch(1);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC5, SINGLE_PARTITION, producer, startLatch, DataType.JSON,
-      Mode.ARRAY_OBJECTS, -1, null));
+      Mode.ARRAY_OBJECTS, -1, null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -424,7 +425,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.jsonContent = JsonMode.ARRAY_OBJECTS;
     conf.dataFormatConfig.jsonMaxObjectLen = 4096;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -451,7 +452,7 @@ public class TestKafkaSource {
     CountDownLatch startLatch = new CountDownLatch(1);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC6, SINGLE_PARTITION, producer, startLatch, DataType.XML, null, -1,
-      null));
+      null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -467,7 +468,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.xmlRecordElement = "";
     conf.dataFormatConfig.xmlMaxObjectLen = 4096;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -492,7 +493,7 @@ public class TestKafkaSource {
     CountDownLatch startLatch = new CountDownLatch(1);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC7, SINGLE_PARTITION, producer, startLatch, DataType.XML, null, -1,
-      null));
+      null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -508,7 +509,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.xmlRecordElement = "author";
     conf.dataFormatConfig.xmlMaxObjectLen = 4096;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -545,7 +546,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.xmlRecordElement = "author";
     conf.dataFormatConfig.xmlMaxObjectLen = 4096;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -557,7 +558,7 @@ public class TestKafkaSource {
     CountDownLatch startLatch = new CountDownLatch(1);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC9, SINGLE_PARTITION,
-      producer, startLatch, DataType.CSV, null, -1, null));
+      producer, startLatch, DataType.CSV, null, -1, null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -576,7 +577,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.csvRecordType = CsvRecordType.LIST;
     conf.dataFormatConfig.csvSkipStartLines = 0;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -601,7 +602,7 @@ public class TestKafkaSource {
     CountDownLatch startLatch = new CountDownLatch(1);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC10, SINGLE_PARTITION, producer, startLatch, DataType.LOG, null,
-      -1, null));
+      -1, null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -627,7 +628,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.enableLog4jCustomLogFormat = false;
     conf.dataFormatConfig.log4jCustomLogFormat = null;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -668,11 +669,10 @@ public class TestKafkaSource {
 
   @Test
   public void testProduceLogRecordsWithStackTraceSameMessage() throws StageException, IOException, InterruptedException {
-
     CountDownLatch startLatch = new CountDownLatch(1);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable(TOPIC11, SINGLE_PARTITION, producer, startLatch,
-      DataType.LOG_STACK_TRACE, null, -1, null));
+      DataType.LOG_STACK_TRACE, null, -1, null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -698,7 +698,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.enableLog4jCustomLogFormat = false;
     conf.dataFormatConfig.log4jCustomLogFormat = null;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -745,7 +745,7 @@ public class TestKafkaSource {
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     CountDownLatch countDownLatch = new CountDownLatch(1);
     executorService.submit(new ProducerRunnable(TOPIC11, SINGLE_PARTITION, producer, startLatch,
-      DataType.LOG_STACK_TRACE, null, 10, countDownLatch));
+      DataType.LOG_STACK_TRACE, null, 10, countDownLatch, sdcKafkaTestUtil));
     // produce all 10 records first before starting the source(KafkaConsumer)
     startLatch.countDown();
     countDownLatch.await();
@@ -774,7 +774,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.enableLog4jCustomLogFormat = false;
     conf.dataFormatConfig.log4jCustomLogFormat = null;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
         // Set mode to preview
       .setPreview(true)
@@ -870,7 +870,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.avroSchemaSource = OriginAvroSchemaSource.SOURCE;
     conf.dataFormatConfig.avroSchema = AVRO_SCHEMA;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -1026,7 +1026,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.avroSchemaSource = OriginAvroSchemaSource.INLINE;
     conf.dataFormatConfig.avroSchema = AVRO_SCHEMA;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
 
@@ -1121,7 +1121,7 @@ public class TestKafkaSource {
 
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(new ProducerRunnable( TOPIC14, SINGLE_PARTITION, producer, startLatch, DataType.TEXT, null, -1,
-      null));
+      null, sdcKafkaTestUtil));
 
     KafkaConfigBean conf = new KafkaConfigBean();
     conf.metadataBrokerList = sdcKafkaTestUtil.getMetadataBrokerURI();
@@ -1136,7 +1136,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.removeCtrlChars = false;
     conf.dataFormatConfig.binaryMaxObjectLen = 1000;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
     sourceRunner.runInit();
@@ -1192,7 +1192,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.messageType = "util.Employee";
     conf.dataFormatConfig.isDelimited = true;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
     sourceRunner.runInit();
@@ -1235,7 +1235,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.messageType = "util.Employee";
     conf.dataFormatConfig.isDelimited = true;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
     sourceRunner.runInit();
@@ -1289,7 +1289,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.excludeInterval = false;
     conf.dataFormatConfig.authFilePath = Resources.getResource(COLLECTD_AUTH_TXT).getPath();
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
     sourceRunner.runInit();
@@ -1330,7 +1330,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.removeCtrlChars = false;
     conf.dataFormatConfig.datagramMode = DatagramMode.SYSLOG;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
     sourceRunner.runInit();
@@ -1389,7 +1389,7 @@ public class TestKafkaSource {
     conf.dataFormatConfig.removeCtrlChars = false;
     conf.dataFormatConfig.datagramMode = DatagramMode.NETFLOW;
 
-    SourceRunner sourceRunner = new SourceRunner.Builder(StandaloneKafkaSource.class, createSource(conf))
+    SourceRunner sourceRunner = new SourceRunner.Builder(KafkaDSource.class, createSource(conf))
       .addOutputLane("lane")
       .build();
     sourceRunner.runInit();
