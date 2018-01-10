@@ -178,6 +178,7 @@
               "xmail.password",
               "xmail.from.address",
               "monitor.memory",
+              "max.stage.private.classloaders",
               "kerberos.client.enabled",
               "preview.maxBatchSize",
               "preview.maxBatches",
@@ -228,14 +229,6 @@
               {
                 "key" : "ui.local.help.base.url",
                 "value" : "/docs"
-              },
-              {
-                "key" : "ui.refresh.interval.ms",
-                "value" : "2000"
-              },
-              {
-                "key" : "ui.jvmMetrics.refresh.interval.ms",
-                "value" : "4000"
               }
             ]
           },
@@ -697,6 +690,20 @@
           "description": "Number of recent actions stored so you can undo them.",
           "type": "long",
           "default": 10
+         },
+         {
+          "name": "ui.refresh.interval.ms",
+          "label": "UI Refresh Interval",
+          "description": "Interval used to refresh various UI elements such as metrics.",
+          "type": "long",
+          "default": 2000
+         },
+         {
+          "name": "ui.jvmMetrics.refresh.interval.ms",
+          "label": "JVM Metrics Refresh Interval",
+          "description": "Interval in which the SDC Metrics page will refresh.",
+          "type": "long",
+          "default": 4000
         },
         {
           "name": "mail.transport.protocol",
@@ -776,6 +783,13 @@
           "description": "Monitor memory of stages. Use only to test real-world load usage in test or production environments.",
           "type": "boolean",
           "default": "false"
+        },
+        {
+          "name": "max.stage.private.classloaders",
+          "label": "Maximum number of private classloaders",
+          "description": "Stage that have configuration singletons (i.e. Hadoop FS & Hbase) require private classloaders.",
+          "type": "long",
+          "default": "50"
         },
         {
           "name": "runner.thread.pool.size",

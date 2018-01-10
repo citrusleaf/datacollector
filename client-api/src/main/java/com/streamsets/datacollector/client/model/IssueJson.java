@@ -30,10 +30,11 @@ public class IssueJson   {
   private String message = null;
   private String level = null;
   private String instanceName = null;
+  private String serviceName = null;
   private String configGroup = null;
   private String configName = null;
   private Map<String, Object> additionalInfo = new HashMap<String, Object>();
-
+  private long count;
 
   /**
    **/
@@ -68,6 +69,17 @@ public class IssueJson   {
   }
   public void setInstanceName(String instanceName) {
     this.instanceName = instanceName;
+  }
+
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("serviceName")
+  public String getServiceName() {
+    return serviceName;
+  }
+  public void setServiceName(String serviceName) {
+    this.serviceName = serviceName;
   }
 
 
@@ -106,6 +118,16 @@ public class IssueJson   {
     this.additionalInfo = additionalInfo;
   }
 
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("count")
+  public long getCount() {
+    return count;
+  }
+  public void setCount(long count) {
+    this.count = count;
+  }
 
 
   @Override
@@ -116,6 +138,7 @@ public class IssueJson   {
     sb.append("    message: ").append(StringUtil.toIndentedString(message)).append("\n");
     sb.append("    level: ").append(StringUtil.toIndentedString(level)).append("\n");
     sb.append("    instanceName: ").append(StringUtil.toIndentedString(instanceName)).append("\n");
+    sb.append("    serviceName: ").append(StringUtil.toIndentedString(serviceName)).append("\n");
     sb.append("    configGroup: ").append(StringUtil.toIndentedString(configGroup)).append("\n");
     sb.append("    configName: ").append(StringUtil.toIndentedString(configName)).append("\n");
     sb.append("    additionalInfo: ").append(StringUtil.toIndentedString(additionalInfo)).append("\n");

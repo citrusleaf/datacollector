@@ -410,7 +410,7 @@ public class TestJythonProcessor {
             "  output.write(record);\n"
     );
 
-    ScriptingProcessorTestUtil.verifyNullField(JythonProcessor.class, processor, record);
+    ScriptingProcessorTestUtil.verifyNullField(JythonDProcessor.class, processor, record);
   }
 
   @Test
@@ -429,7 +429,7 @@ public class TestJythonProcessor {
         ProcessingMode.RECORD,
         script
     );
-    ScriptingProcessorTestUtil.verifyCreateRecord(JythonProcessor.class, processor);
+    ScriptingProcessorTestUtil.verifyCreateRecord(JythonDProcessor.class, processor);
   }
 
   @Test
@@ -444,7 +444,9 @@ public class TestJythonProcessor {
         ProcessingMode.RECORD,
         script
     );
-    ScriptingProcessorTestUtil.verifyRecordHeaderAttribute(JythonProcessor.class, processor, RecordCreator.create());
+
+    Record record = RecordCreator.create();
+    ScriptingProcessorTestUtil.verifyRecordHeaderAttribute(JythonDProcessor.class, processor, record);
   }
 
   @Test
@@ -462,7 +464,7 @@ public class TestJythonProcessor {
         initScript,
         destroyScript
     );
-    ScriptingProcessorTestUtil.verifyInitDestroy(JythonProcessor.class, processor);
+    ScriptingProcessorTestUtil.verifyInitDestroy(JythonDProcessor.class, processor);
   }
 
   @Test
@@ -471,7 +473,7 @@ public class TestJythonProcessor {
         "  record.value['company'] = sdcFunctions.pipelineParameters()['company']\n" +
         "  output.write(record)";
     Processor processor = new JythonProcessor(ProcessingMode.BATCH, script);
-    ScriptingProcessorTestUtil.verifyConstants(JythonProcessor.class, processor);
+    ScriptingProcessorTestUtil.verifyConstants(JythonDProcessor.class, processor);
   }
 
   private static final String WRITE_ERROR_SCRIPT = "for record in records:\n  error.write(record, 'oops')\n";
@@ -482,7 +484,7 @@ public class TestJythonProcessor {
       ProcessingMode.RECORD,
       WRITE_ERROR_SCRIPT
     );
-    ScriptingProcessorTestUtil.verifyErrorRecordStopPipeline(JythonProcessor.class, processor);
+    ScriptingProcessorTestUtil.verifyErrorRecordStopPipeline(JythonDProcessor.class, processor);
   }
 
   @Test
@@ -491,7 +493,7 @@ public class TestJythonProcessor {
       ProcessingMode.RECORD,
       WRITE_ERROR_SCRIPT
     );
-    ScriptingProcessorTestUtil.verifyErrorRecordDiscard(JythonProcessor.class, processor);
+    ScriptingProcessorTestUtil.verifyErrorRecordDiscard(JythonDProcessor.class, processor);
   }
 
 
@@ -501,6 +503,6 @@ public class TestJythonProcessor {
       ProcessingMode.RECORD,
       WRITE_ERROR_SCRIPT
     );
-    ScriptingProcessorTestUtil.verifyErrorRecordErrorSink(JythonProcessor.class, processor);
+    ScriptingProcessorTestUtil.verifyErrorRecordErrorSink(JythonDProcessor.class, processor);
   }
 }

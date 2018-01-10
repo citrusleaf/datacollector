@@ -29,11 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aerospike.client.AerospikeClient;
+import com.aerospike.client.async.AsyncClient;
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
 import com.aerospike.client.Value;
 import com.aerospike.client.policy.ClientPolicy;
+import com.aerospike.client.async.AsyncClientPolicy;
 import com.aerospike.client.policy.WritePolicy;
 import com.streamsets.pipeline.api.Batch;
 import com.streamsets.pipeline.api.Field;
@@ -53,7 +55,7 @@ public class AerospikeTarget extends BaseTarget {
 
 	private static final int MAX_BIN_NAME = 14;
 	private static final Logger LOG = LoggerFactory.getLogger(AerospikeTarget.class);
-	private AerospikeClient client = null;
+	private AsyncClient client = null;
 	private AerospikeTargetConfig conf = null;
 	public AerospikeTarget(AerospikeTargetConfig conf) {
 		this.conf = conf;
@@ -100,7 +102,7 @@ public class AerospikeTarget extends BaseTarget {
 
 		if (issues.size() == 0) {
 			// Try to connect to the cluster
-			ClientPolicy policy = new ClientPolicy();
+			AsyncClientPolicy policy = new AsyncClientPolicy();
 			if(conf.authProviderOption != AuthProviderOption.NONE){
 				policy.user = conf.username;
 				policy.password = conf.password;
@@ -109,7 +111,7 @@ public class AerospikeTarget extends BaseTarget {
 			policy.failIfNotConnected = true;
 			policy.timeout = conf.connectionTimeout;
 			try {
-				client = new AerospikeClient(policy, conf.seedHost, conf.port);
+				client = new AsyncClient(policy, conf.seedHost, conf.port);
 				if (conf != null) {
 					if (conf.aerospikeFieldMapping.isEmpty()) {
 						issues.add(
@@ -288,7 +290,7 @@ public class AerospikeTarget extends BaseTarget {
 			writePolicy.sendKey = conf.storePK;
 			writePolicy.expiration = ttl;
 			writePolicy.recordExistsAction = conf.recordExistsAction.getAction();
-			client.put(writePolicy, key, bins.toArray(new Bin[bins.size()]));
+			client.put(writePolicy, null, key, bins.toArray(new Bin[bins.size()]));
 		}
 		else {
 			throw new OnRecordErrorException(Errors.SAMPLE_01, record, "No bins to write, check log for details.");

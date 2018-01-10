@@ -570,7 +570,12 @@ public class JdbcUtil {
               case STOP_PIPELINE:
                 throw new StageException(JdbcErrors.JDBC_37, md.getColumnType(columnIndex), md.getColumnLabel(columnIndex));
               case CONVERT_TO_STRING:
-                field = Field.create(Field.Type.STRING, rs.getObject(columnIndex).toString());
+                Object value = rs.getObject(columnIndex);
+                if(value != null) {
+                  field = Field.create(Field.Type.STRING, rs.getObject(columnIndex).toString());
+                } else {
+                  field = Field.create(Field.Type.STRING, null);
+                }
                 break;
               default:
                 throw new IllegalStateException("Unknown action: " + unknownTypeAction);
@@ -712,6 +717,10 @@ public class JdbcUtil {
       config.setTransactionIsolation(hikariConfigBean.transactionIsolation.name());
     }
 
+    if(StringUtils.isNotEmpty(hikariConfigBean.initialQuery)) {
+      config.setConnectionInitSql(hikariConfigBean.initialQuery);
+    }
+
     config.setDataSourceProperties(hikariConfigBean.getDriverProperties());
 
     return config;
@@ -728,7 +737,7 @@ public class JdbcUtil {
     HikariDataSource dataSource = new HikariDataSource(createDataSourceConfig(hikariConfigBean, false, false));
 
     // Can only validate schema if the user specified a single table.
-    if (!tableNameTemplate.contains(EL_PREFIX)) {
+    if (tableNameTemplate != null && !tableNameTemplate.contains(EL_PREFIX)) {
       try (
         Connection connection = dataSource.getConnection();
         ResultSet res = JdbcUtil.getTableMetadata(connection, schema, tableNameTemplate, caseSensitive);

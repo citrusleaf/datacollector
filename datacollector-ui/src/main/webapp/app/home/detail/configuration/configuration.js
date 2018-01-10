@@ -19,12 +19,11 @@
 
 angular
   .module('dataCollectorApp.home')
-
   .controller('ConfigurationController', function (
     $scope, $rootScope, $q, $modal, _, $timeout, api, previewService, pipelineConstant, pipelineService
   ) {
 
-    var getIssues = function(config, issues, instanceName, configDefinition) {
+    var getIssues = function(config, issues, instanceName, serviceName, configDefinition) {
       if (instanceName && issues.stageIssues && issues.stageIssues[instanceName]) {
         issues = issues.stageIssues[instanceName];
       } else if (config.errorStage && issues.stageIssues && instanceName &&
@@ -48,7 +47,7 @@ angular
       }
 
       return _.filter((issues || []), function(issue) {
-        return (issue.configName === configDefinition.name);
+        return (issue.configName === configDefinition.name && issue.serviceName === serviceName);
       });
     };
 
@@ -170,12 +169,23 @@ angular
         var commonErrors = $rootScope.common.errors;
         var issues;
 
+        // The configObject can be one of two things - either StageDefinition or ServiceDefinition.
+        var instanceName;
+        var serviceName;
+        if ("service" in configObject) {
+          instanceName = $scope.detailPaneConfig.instanceName;
+          serviceName = configObject.service;
+        } else {
+          instanceName = configObject.instanceName;
+          serviceName = null;
+        }
+
         if (config && config.issues) {
-          issues = getIssues(config, config.issues, configObject.instanceName, configDefinition);
+          issues = getIssues(config, config.issues, instanceName, serviceName, configDefinition);
         }
 
         if (issues.length === 0 && commonErrors && commonErrors.length && commonErrors[0].pipelineIssues) {
-          issues = getIssues(config, commonErrors[0], configObject.instanceName, configDefinition);
+          issues = getIssues(config, commonErrors[0], instanceName, serviceName, configDefinition);
         }
 
         return issues;
@@ -512,9 +522,58 @@ angular
         }
       },
 
+      /**
+       * Generate structure for ng-repeat of a ValueChooserModel.
+       *
+       * Return structure will be filtered based on the runtime value of a filterConfig if one
+       * exists and is specified.
+       *
+       * @param instance Instance of a stage or service.
+       * @param configDefinition Definition of the ValueChooser config
+       * @returns [{label:*, value:*}]
+       */
+      getValueChooserOptions: function(instance, definition) {
+        var list = [];
+        var filter = $scope.getConfig(definition.model.filteringConfig, instance);
+
+        angular.forEach(definition.model.values, function(value, index) {
+
+          if(filter && filter.indexOf(value) < 0) {
+            return;
+          }
+
+          var entry = {
+            label: definition.model.labels[index],
+            value: value
+          };
+          list.push(entry);
+        });
+
+        return list;
+      },
 
       /**
-       * Returns filtered & sorted Group Configurations.
+       * Return config of given name from the stage or service instance.
+       *
+       * @param name Name of the config.
+       * @param instance Instance of a stage or service.
+       * @returns {*}
+       */
+      getConfig: function(name, instance) {
+        var value = undefined;
+
+        angular.forEach(instance.configuration, function(config) {
+          if(config.name === name) {
+            value = config.value;
+          }
+        });
+
+        return value;
+      },
+
+
+      /**
+       * Returns true if at least one config is visible in given group.
        *
        * @param stageInstance
        * @param configDefinitions
@@ -534,6 +593,29 @@ angular
         return visible;
       },
 
+      /**
+       * Returns true if at least one config is visible in given group. This will calculate
+       * visibility in the main stage configuration and all declared services.
+       *
+       * @param stageInstance
+       * @param stageDefinition
+       * @param groupName
+       * @returns {*}
+       */
+      isStageGroupVisible: function(stageInstance, stageDefinition, services, groupName) {
+        // First see if this tab is visible in normal stage configurations
+        if(this.isGroupVisible(stageInstance, stageDefinition.configDefinitions, groupName)) {
+          return true;
+        }
+
+        var visible = false;
+        angular.forEach(services, function(service) {
+          if($scope.isGroupVisible(service.config, service.definition.configDefinitions, groupName)) {
+            visible = true;
+          }
+        });
+        return visible;
+      },
 
       /**
        * Returns true if there is any configuration issue for given Stage Instance name and configuration group.
@@ -618,13 +700,27 @@ angular
     };
 
     /**
+     * Return true if given instance looks like a Stage instance.
+     */
+    var isStageInstance = function(instance) {
+      return !("service" in instance);
+    }
+
+    /**
+     * Return true if given instance is stage instance a source.
+     */
+    var isSourceIstance = function(instance) {
+      return isStageInstance(instance) && instance.uiInfo.stageType === pipelineConstant.SOURCE_STAGE_TYPE;
+    }
+
+    /**
      * Update Stage Preview Data when stage selection changed.
      *
      * @param stageInstance
      */
     var updateFieldDataForStage = function(stageInstance) {
       //In case of processors and targets run the preview to get input fields & if current state of config is previewable.
-      if (stageInstance.uiInfo.stageType !== pipelineConstant.SOURCE_STAGE_TYPE && !$scope.fieldPathsFetchInProgress) {
+      if (isStageInstance(stageInstance) && !isSourceIstance(stageInstance) && !$scope.fieldPathsFetchInProgress) {
         $scope.fieldPathsFetchInProgress = true;
 
         $scope.fieldPaths = [];
@@ -682,6 +778,16 @@ angular
         $scope.showGroups = (groupDefn.groupNameToLabelMapList.length > 0);
 
         $scope.configGroupTabs = angular.copy(groupDefn.groupNameToLabelMapList);
+        // This code creates groups both for stages and general pipeline configuration. Since only
+        // stages have services, we need to add their groups only selectively.
+        if ('services' in $scope.detailPaneConfigDefn) {
+          angular.forEach($scope.detailPaneConfigDefn.services, function(serviceDependency) {
+            let serviceDef = pipelineService.getServiceDefinition(serviceDependency.service);
+            angular.forEach(serviceDef.configGroupDefinition.groupNameToLabelMapList, function(item) {
+              $scope.configGroupTabs.push(item);
+            });
+          });
+        }
 
         // handle stats group for Pipeline
         if ($scope.selectedType === pipelineConstant.PIPELINE &&
@@ -739,7 +845,7 @@ angular
         $scope.dFieldPaths = [];
         $scope.fieldPathsType = [];
 
-        if ($scope.detailPaneConfigDefn.producingEvents) {
+        if ($scope.detailPaneConfigDefn && $scope.detailPaneConfigDefn.producingEvents) {
           $scope.producingEventsConfig.value =
             ($scope.detailPaneConfig.eventLanes && $scope.detailPaneConfig.eventLanes.length > 0);
         }

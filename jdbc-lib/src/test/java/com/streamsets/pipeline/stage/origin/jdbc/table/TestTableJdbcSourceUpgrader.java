@@ -17,6 +17,7 @@ package com.streamsets.pipeline.stage.origin.jdbc.table;
 
 import com.streamsets.pipeline.api.Config;
 import com.streamsets.pipeline.api.impl.Utils;
+import com.streamsets.pipeline.config.upgrade.UpgraderTestUtils;
 import com.streamsets.pipeline.config.upgrade.UpgraderUtils;
 import com.streamsets.pipeline.stage.origin.jdbc.CommonSourceConfigBean;
 import org.junit.Assert;
@@ -163,6 +164,52 @@ public class TestTableJdbcSourceUpgrader {
 
     assertHasAllEntries(upgradedTableConfig1, tableConfigMap1);
     assertHasAllEntries(upgradedTableConfig2, tableConfigMap2);
+  }
+
+  @Test
+  public void testUpgradeV4ToV5() throws Exception {
+    List<Config> configs = new ArrayList<>();
+    configs.add(new Config("tableJdbcConfigBean.numberOfThreads", 2));
+    final String queryIntervalField = "commonSourceConfigBean.queryInterval";
+    configs.add(new Config(queryIntervalField, "${10 * SECONDS}"));
+
+    TableJdbcSourceUpgrader upgrader = new TableJdbcSourceUpgrader();
+    List<Config> upgradedConfigs = upgrader.upgrade("lib", "stage", "stageInst", 4, 5, configs);
+
+    UpgraderTestUtils.assertNoneExist(upgradedConfigs, queryIntervalField);
+    UpgraderTestUtils.assertExists(upgradedConfigs, "commonSourceConfigBean.queriesPerSecond", "0.2");
+  }
+
+  @Test
+  public void testUpgradeV4ToV5StringNumThreads() throws Exception {
+    List<Config> configs = new ArrayList<>();
+    configs.add(new Config("tableJdbcConfigBean.numberOfThreads", "${runtime:conf('numCpus')}"));
+    final String queryIntervalField = "commonSourceConfigBean.queryInterval";
+    configs.add(new Config(queryIntervalField, "${10 * SECONDS}"));
+
+    TableJdbcSourceUpgrader upgrader = new TableJdbcSourceUpgrader();
+    List<Config> upgradedConfigs = upgrader.upgrade("lib", "stage", "stageInst", 4, 5, configs);
+
+    UpgraderTestUtils.assertNoneExist(upgradedConfigs, queryIntervalField);
+    UpgraderTestUtils.assertExists(upgradedConfigs, "commonSourceConfigBean.queriesPerSecond", "0.2");
+  }
+
+  @Test
+  // SDC-8014: if numThreads/queryInterval is non-terminating, we should not throw ArithmeticException
+  public void testUpgradeV4ToV5NonTerminating() throws Exception {
+    List<Config> configs = new ArrayList<>();
+    configs.add(new Config("tableJdbcConfigBean.numberOfThreads", 22));
+    final String queryIntervalField = "commonSourceConfigBean.queryInterval";
+    configs.add(new Config(queryIntervalField, "${7 * SECONDS}"));
+
+    TableJdbcSourceUpgrader upgrader = new TableJdbcSourceUpgrader();
+    List<Config> upgradedConfigs = upgrader.upgrade("lib", "stage", "stageInst", 4, 5, configs);
+
+    UpgraderTestUtils.assertNoneExist(upgradedConfigs, queryIntervalField);
+    UpgraderTestUtils.assertAllExist(upgradedConfigs, "commonSourceConfigBean.queriesPerSecond");
+    Assert.assertTrue(upgradedConfigs.stream()
+        .filter(config -> config.getName().equals("commonSourceConfigBean.queriesPerSecond"))
+        .allMatch(config -> ((String) config.getValue()).startsWith("3.14285")));
   }
 
   private static void assertAllContain(String configKey, Object configValue, LinkedHashMap... tableConfigMaps) {

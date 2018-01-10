@@ -39,7 +39,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.metastore.MetaStoreUtils;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,8 +119,8 @@ public final class HiveMetastoreUtil {
   public static final String PARQUET_SERDE = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe";
 
 
-  private static final SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-  private static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+  private static final ThreadLocal<SimpleDateFormat> datetimeFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+  private static final ThreadLocal<SimpleDateFormat> timeFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("HH:mm:ss"));
 
   private static final String UNSUPPORTED_PARTITION_VALUE_REGEX = "(.*)[\\\\\"\'/?*%?^=\\[\\]]+(.*)";
   private static final Pattern UNSUPPORTED_PARTITION_VALUE_PATTERN = Pattern.compile(UNSUPPORTED_PARTITION_VALUE_REGEX);
@@ -662,10 +661,10 @@ public final class HiveMetastoreUtil {
           currField = Field.create(currField.getValueAsString());
           break;
         case DATETIME:
-          currField = Field.create(Field.Type.STRING, currField.getValue() == null ? null : datetimeFormat.format(currField.getValueAsDate()));
+          currField = Field.create(Field.Type.STRING, currField.getValue() == null ? null : datetimeFormat.get().format(currField.getValueAsDate()));
           break;
         case TIME:
-          currField = Field.create(Field.Type.STRING, currField.getValue() == null ? null : timeFormat.format(currField.getValueAsTime()));
+          currField = Field.create(Field.Type.STRING, currField.getValue() == null ? null : timeFormat.get().format(currField.getValueAsTime()));
           break;
         default:
           break;
@@ -701,10 +700,6 @@ public final class HiveMetastoreUtil {
     return columns;
   }
 
-  public static boolean validateName(String valName){
-    return MetaStoreUtils.validateName(valName);
-  }
-
   /**
    * Checks if partition value contains unsupported character.
    * @param value String to check
@@ -716,6 +711,9 @@ public final class HiveMetastoreUtil {
 
   /**
    * Validate that given object name (column, table, database, ...) is valid.
+   *
+   * This method is the least common denominator of what both Avro and Hive allows. Since we match Avro schema field
+   * names directly to hive names, we can work only with only those names that work everywhere.
    */
   public static boolean validateObjectName(String objName) {
     return OBJECT_NAME_PATTERN.matcher(objName).matches();

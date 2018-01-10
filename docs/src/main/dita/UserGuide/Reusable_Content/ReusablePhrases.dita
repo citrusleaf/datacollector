@@ -22,17 +22,20 @@
       <shortdesc>Use the following reusable phrases for conrefs in the book. <draft-comment
                   author="Loretta">Company name - not really using this</draft-comment></shortdesc>
       <conbody>
-            <p>
-                  <note>Do NOT use conrefs in headings - it causes problems in the webhelp
-                        navigation panel.</note>
-            </p>
             <p>Company name: <ph id="company">StreamSets</ph></p>
             <draft-comment author="Loretta">product name: trying to consistently use
                   this</draft-comment>
             <p>Full, init cap version of the product name: <ph id="pName-long">Data
                   Collector</ph></p>
-            <p>DPM long only: <ph id="DPM-LongOnly">Dataflow Performance Manager</ph></p>
-            <p>DPM short: <ph id="DPM-short">DPM</ph></p>
+            <p>DPM => SCH long only: <ph id="DPM-LongOnly">StreamSets Control Hub</ph></p>
+            <p>DPM => SCH short: <ph id="DPM-short">Control Hub</ph></p>
+            <p>SCH acro, as in (SCH) : <ph id="SCH_acro">SCH</ph></p>
+            <p>Full, init cap version of the edge: <ph id="Edge-Long">Data Collector Edge</ph></p>
+            <p>Full, init cap version of the edge in plural form: <ph id="Edge-Long-Plural">Edge
+                        Data Collectors</ph></p>
+            <p>Shortened version of edge: <ph id="Edge-Short">SDC Edge</ph></p>
+            <p>For DPM-only docs: <ph id="PDesigner">Pipeline Designer</ph>
+            </p>
             <p>
                   <draft-comment author="Loretta">The old Hive Drift Solution
                         rename.</draft-comment>
@@ -40,8 +43,183 @@
             <p><ph id="HiveDrift-ph">Drift Synchronization Solution for Hive</ph></p>
             <draft-comment author="alisontaylor">The following ph's for the current version are used
                   in the install and upgrade steps:</draft-comment>
-            <p><ph id="version">2.8.0.0</ph></p>
-            <p><ph id="version_DirName">2800</ph></p>
+            <p><ph id="version">3.0.0.0</ph></p>
+            <p><ph id="version_DirName">3000</ph></p>
+            <draft-comment author="alisontaylor">Supported operating systems for install
+                  instructions</draft-comment>
+            <p><ph id="ph_LinuxEL6">CentOS 6, Red Hat Enterprise Linux 6, or Ubuntu 14.04
+                  LTS</ph></p>
+            <p><ph id="ph_LinuxEL6_RPM">CentOS 6 or Red Hat Enterprise Linux 6</ph></p>
+            <p><ph id="ph_LinuxEL7">CentOS 7, Red Hat Enterprise Linux 7, or Ubuntu 16.04
+                  LTS</ph></p>
+            <p><ph id="ph_LinuxEL7_RPM">CentOS 7 or Red Hat Enterprise Linux 7</ph></p>
+            <draft-comment author="alisontaylor">SDC service shutdown instructions used in
+                  Uninstallation, Upgrade, and Shutdown task in Admin chapter. </draft-comment>
+            <p id="shutdownServiceLinuxEL6">For <ph conref="#concept_vhs_5tz_xp/ph_LinuxEL6"/>, use:
+                        <codeph>service sdc stop</codeph></p>
+            <p id="shutdownServiceLinuxEL7">For <ph conref="#concept_vhs_5tz_xp/ph_LinuxEL7"/>, use:
+                        <codeph>systemctl stop sdc</codeph></p>
+            <p id="shutdownServiceLinxuEL6_RPM">For <ph conref="#concept_vhs_5tz_xp/ph_LinuxEL6_RPM"
+                  />, use: <codeph>service sdc stop</codeph></p>
+            <p id="shutdownServiceLinxuEL7_RPM">For <ph conref="#concept_vhs_5tz_xp/ph_LinuxEL7_RPM"
+                  />, use: <codeph>systemctl stop sdc</codeph></p>
+            <draft-comment author="alisontaylor">The following are used in install, upgrade, and
+                  configuring system user and group for OS's that use the systemd init
+                  system</draft-comment>
+            <p id="override_systemdconfig">Override the default values in the
+                        <codeph>sdc.service</codeph> file using the same procedure that you use to
+                  override unit configuration files on a systemd init system. For an example, see
+                  "Example 2. Overriding vendor settings" in this <xref
+                        href="https://www.freedesktop.org/software/systemd/man/systemd.unit.html"
+                        format="html" scope="external">systemd.unit manpage</xref>.</p>
+            <codeblock id="systemd_reload">systemctl daemon-reload</codeblock>
+            <draft-comment author="alisontaylor">SDC UI shutdown instructions used in
+                  Uninstallation, Upgrade, and Shutdown task in Admin chapter. </draft-comment>
+            <p id="shutdownUI">To use the <ph
+                        conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                  /> UI, click <menucascade>
+                        <uicontrol>Administration</uicontrol>
+                        <uicontrol> Shut Down</uicontrol>
+                  </menucascade>. When the confirmation dialog box appears, click
+                        <uicontrol>Yes</uicontrol>.</p>
+            <p>
+                  <draft-comment author="Loretta">Used in Configuring the SDC Environment and in
+                        MapR Prereq > Install Client Libraries</draft-comment>
+            </p>
+            <p>
+                  <ul id="ul-SDCenvfiles">
+                        <li><codeph>$SDC_DIST/libexec/sdc-env.sh</codeph> - Used when you start <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                              /> manually from the command line or when you start Data Collector as
+                              a service on operating systems that use the systemd init system -
+                              including <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/ph_LinuxEL7"
+                              />. </li>
+                        <li><codeph>$SDC_DIST/libexec/sdcd-env.sh</codeph> - Used when you start <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                              /> as a service on operating systems that use the SysV init system -
+                              including <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/ph_LinuxEL6"
+                              />.</li>
+                  </ul>
+            </p>
+            <draft-comment author="Loretta">
+                  <p>For SDC/DPM xrefs to Configuring SDC.</p>
+            </draft-comment>
+            <p><ph id="SDCDPM_ConfigSDC">
+                        <ph product="SDC">For more information, see <xref
+                                    href="../Configuration/ConfiguringDataCollector.dita#task_lxk_kjw_1r"
+                              /></ph><ph product="DPM">For more information, see <xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/DCConfig.html"
+                                    format="html" scope="external">Configuring Data Collector</xref>
+                              in the <ph conref="#concept_vhs_5tz_xp/pName-long"/>
+                              documentation</ph>.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">For SDC/DPM xrefs to SDC Environment
+                        Config.</draft-comment>
+            </p>
+            <p><ph id="SDCDPM_SDCenvConfigs">For more information about environment variables, see
+                              <xref
+                              href="../Configuration/DCEnvironmentConfig.dita#concept_rng_qym_qr"
+                              product="SDC"/><ph product="DPM"><xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/DCEnvironmentConfig.html"
+                                    format="html" scope="external">Data Collector Environment
+                                    Configuration</xref> in the <ph
+                                    conref="#concept_vhs_5tz_xp/pName-long"/>
+                        documentation</ph>.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">SDC/DPM Data Collector Logs</draft-comment>
+            </p>
+            <p><ph id="SDCDPM_SDCLogs">For details, see <xref
+                              href="../Administration/ViewingLogData.dita#task_gbm_s3k_br"
+                              product="SDC"/><ph product="DPM">Viewing Data Collector Logs in the
+                                    <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                              /> documentation</ph>.</ph></p>
+            <draft-comment author="Loretta">SDC/DPM Data Collector Log Level</draft-comment>
+            <p><ph id="SDCDPM_LogLevel">For details, see <xref
+                              href="../Administration/ModifyingLogLevel.dita#task_lkv_g2f_wy"
+                              product="SDC"/><ph product="DPM">Modifying the Log Level in the <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                              /> documentation</ph>.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">SDC/DPM external libraries</draft-comment>
+            </p>
+            <p><ph id="SDCDPM_ExtLibs">For information about installing additional drivers, see
+                              <xref href="../Configuration/ExternalLibs.dita#concept_pdv_qlw_ft"
+                              product="SDC"/><ph product="DPM"><xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/ExternalLibs.html%23concept_pdv_qlw_ft"
+                                    format="html" scope="external">Install External Libraries</xref>
+                              in the <ph conref="#concept_vhs_5tz_xp/pName-long"/>
+                              documentation</ph>.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">SDC/DPM Hadoop Impersonation Mode</draft-comment>
+            </p>
+            <p><ph id="SDCDPM_HDFSImperMode">For more information, see <xref
+                              href="../Configuration/HadoopImpersonationMode.dita#concept_pmr_sy5_nz"
+                              product="SDC"/><ph product="DPM"><xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/DCConfig.html%23concept_pmr_sy5_nz"
+                                    format="html" scope="external">Hadoop Impersonation Mode</xref>
+                              in the <ph conref="#concept_vhs_5tz_xp/pName-long"/>
+                              documentation</ph>.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">SDC/DPM HTTPS for Cluster
+                        Pipelines</draft-comment>
+            </p>
+            <p><ph id="SDCDPM_httpsClusterPipes">For more information, see <xref
+                              href="../Configuration/HTTP_protocolsCluster.dita#concept_rdt_h54_cw"
+                              product="SDC"/><ph product="DPM"><xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/DCConfig.html%23concept_rdt_h54_cw"
+                                    format="html" scope="external">Configuring HTTPS for Cluster
+                                    Pipelines</xref> in the <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                              /> documentation</ph>.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">SDC/DPM Java Heap Size</draft-comment>
+            </p>
+            <p><ph id="SDCDPM-JavaHeapSize">For information about configuring the <ph
+                              conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                        /> heap size, see <xref
+                              href="../Configuration/JavaHeapSize.dita#concept_mdc_shg_qr"
+                              product="SDC"/><ph product="DPM"><xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/DCEnvironmentConfig.html%23concept_mdc_shg_qr"
+                                    format="html" scope="external">Java Heap Size</xref> in the <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                              /> documentation</ph>.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">SDC/DPM Kerberos Authentication</draft-comment>
+            </p>
+            <p><ph id="SDCDPM-Kerberos">For more information about enabling Kerberos authentication
+                        for <ph
+                              conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                        />, see <xref href="../Configuration/Kerberos.dita#concept_hnm_n4l_xs"
+                              product="SDC"/><ph product="DPM"><xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/DCConfig.html%23concept_hnm_n4l_xs"
+                                    format="html" scope="external">Kerberos Authentication</xref> in
+                              the Data Collector documentation</ph>.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">SDC/DPM MapR Prereqs</draft-comment>
+            </p>
+            <p><ph id="SDCDPM_MapRPrereq">For more information, see <xref
+                              href="../Installation/MapR-Prerequisites.dita#concept_jgs_qpg_2v"
+                              product="SDC"/><ph product="DPM"><xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Installation/MapR-Prerequisites.html%23concept_jgs_qpg_2v"
+                                    format="html" scope="external">MapR Prerequisites</xref> in the
+                                    <ph conref="#concept_vhs_5tz_xp/pName-long"/>
+                        documentation</ph>.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">SDC/DPM Pipeline Monitoring
+                        Overview</draft-comment>
+            </p>
+            <p><ph id="SDCDPM-PipelineMonitoring">For more information about monitoring pipelines,
+                        see <xref
+                              href="../Pipeline_Monitoring/PipelineMonitoring.dita#concept_hsp_tnt_lq"
+                              product="SDC"/><ph product="DPM"><xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Pipeline_Monitoring/PipelineMonitoring_title.html%23concept_hsp_tnt_lq"
+                                    format="html" scope="external">Pipeline Monitoring
+                                    Overview</xref> in the <ph
+                                    conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                              /> documentation</ph>.</ph></p>
             <p>
                   <draft-comment author="Loretta">Data Collector max buffer size for records,
                         overridden by the parser.limit SDC property. used in Configuring SDC and
@@ -51,8 +229,10 @@
             <draft-comment author="alisontaylor">The following codeblock is used in all launching
                   SDC topics</draft-comment>
             <codeblock id="SDCBaseURL">http://&lt;hostname>:18630/</codeblock>
-            <p><draft-comment author="alisontaylor">The following p is used in the registering and
-                  unregistering from DPM topics.</draft-comment></p>
+            <p>
+                  <draft-comment author="alisontaylor">The following p is used in the registering
+                        and unregistering from DPM topics.</draft-comment>
+            </p>
             <p id="p-DPMUserNameFormat">
                   <codeblock>&lt;ID>@&lt;organization ID></codeblock>
             </p>
@@ -159,6 +339,7 @@
                         <li>SDC RPC</li>
                         <li>SFTP/FTP Client</li>
                         <li>TCP Server</li>
+                        <li>UDP Multithreaded Source</li>
                         <li>UDP Source</li>
                         <li>WebSocket Client</li>
                         <li>WebSocket Server</li>
@@ -284,11 +465,9 @@
                         whichever ones allow wildcard use:</draft-comment>
             </p>
             <p id="wildcard"><ph id="ph-wildcard">You can use the asterisk wildcard to represent
-                        array indices and map elements. <xref
+                              <xref
                               href="../Pipeline_Configuration/WildcardsArraysMaps.dita#concept_vqr_sqc_wr"
-                                    ><image href="../Graphics/icon_moreInfo.png" scale="10"
-                                    id="image_ukp_2dt_bz"/>
-                        </xref></ph>
+                              >array indices and map elements</xref>.</ph>
             </p>
             <p>
                   <draft-comment author="Loretta">The following tip is used several times in
@@ -297,12 +476,9 @@
             <p>
                   <note type="tip" id="tip-asterisk">To use all fields, you can use the asterisk
                         wildcard as follows: <codeph>/*</codeph>. You can also use the asterisk
-                        wildcard to represent array indices and map elements. <ph><xref
-                                    href="../Pipeline_Configuration/WildcardsArraysMaps.dita#concept_vqr_sqc_wr"
-                                          ><image href="../Graphics/icon_moreInfo.png" scale="10"
-                                          id="image_phy_rdt_bz"/>
-                              </xref></ph>
-                  </note>
+                        wildcard to represent <xref
+                              href="../Pipeline_Configuration/WildcardsArraysMaps.dita#concept_vqr_sqc_wr"
+                              >array indices and map elements</xref>. </note>
             </p>
             <p>
                   <draft-comment author="Loretta"><uicontrol>DataFormats-ALL</uicontrol> - <b>no
@@ -583,15 +759,14 @@
                                           conref="#concept_vhs_5tz_xp/UDP-syslog" id="ul_fj2_3q4_4x">
                                           <li/>
                                     </ul></dd>
-                        
-                              <dd><ph conref="#concept_vhs_5tz_xp/ph-NetFlowInfo"/></dd></dlentry>
+                              <dd><ph conref="#concept_vhs_5tz_xp/ph-NetFlowInfo"/></dd>
+                        </dlentry>
                   </dl>
             </p>
-            
-                  <draft-comment author="Loretta"> - from Directory. DLEntries are conrefed by all
-                        origins except HTTP Client. <note> Content for JSON, Text, and HTML copied
-                              to HTTP Client and altered. When making changes here, check there as
-                              well.</note></draft-comment>
+            <draft-comment author="Loretta"> - from Directory. DLEntries are conrefed by all origins
+                  except HTTP Client. <note> Content for JSON, Text, and HTML copied to HTTP Client
+                        and altered. When making changes here, check there as
+                  well.</note></draft-comment>
             <p>
                   <dl id="ORIGIN-DFormats">
                         <dlentry id="OriginDF-DELIM">
@@ -621,9 +796,9 @@
                               <dd>When using a header line, you can allow processing records with
                                     additional columns. The additional columns are named using a
                                     custom prefix and integers in sequential increasing order, such
-                                    as  _extra_1, _extra_2. When you disallow additional columns
-                                    when using a header line, records that include additional
-                                    columns are sent to error.</dd>
+                                    as _extra_1, _extra_2. When you disallow additional columns when
+                                    using a header line, records that include additional columns are
+                                    sent to error.</dd>
                               <dd>You can also replace a string constant with null values.</dd>
                               <dd>When a record exceeds the maximum record length defined for the
                                     origin, the origin processes the object based on the error
@@ -656,9 +831,9 @@
                               <dd>When using a header line, you can allow processing records with
                                     additional columns. The additional columns are named using a
                                     custom prefix and integers in sequential increasing order, such
-                                    as  _extra_1, _extra_2. When you disallow additional columns
-                                    when using a header line, records that include additional
-                                    columns are sent to error.</dd>
+                                    as _extra_1, _extra_2. When you disallow additional columns when
+                                    using a header line, records that include additional columns are
+                                    sent to error.</dd>
                               <dd>You can also replace a string constant with null values.</dd>
                               <dd>When a record exceeds the user-defined maximum record length, the
                                     origin cannot continue processing data in the file. Records
@@ -733,8 +908,7 @@
                                     message based on the stage error handling property and continues
                                     reading the next message. </dd>
                               <dd>For information about generating the descriptor file, see <xref
-                                          href="../Data_Formats/Protobuf-Prerequisites.dita"
-                                    />.</dd>
+                                          href="../Data_Formats/Protobuf-Prerequisites.dita"/>.</dd>
                         </dlentry>
                   </dl>
             </p>
@@ -953,7 +1127,13 @@
                   predicate:<codeblock>/&lt;element>[@&lt;attribute name>='&lt;attribute value>']</codeblock></p>
             <p><ph id="XML-ph-AttAsterisk">You can use the asterisk wildcard as the attribute value.
                         Surround the value in single quotation marks.</ph></p>
-            <p/>
+            <p>
+                  <draft-comment author="Loretta">Oracle Table Names, used in JDBC origins &amp;
+                        Oracle CDC Client.</draft-comment>
+            </p>
+            <p><ph id="Oracletablenames">Oracle uses all caps for schema, table, and column names by
+                        default. Names can be lower- or mixed-case only if the schema, table, or
+                        column was created with quotation marks around the name.</ph></p>
             <p>
                   <draft-comment author="Loretta">Amazon <uicontrol>S3origin-CopyMove1</uicontrol>
                         and 2 used in Amazon S3 origin Configuring.</draft-comment>
@@ -1092,14 +1272,14 @@ web-0011.log</codeblock></dd>
             </p>
             <draft-comment author="alisontaylor"><uicontrol>TIP-CompareWebSocketOrigins</uicontrol>
                   used in both WebSocket origin overviews</draft-comment>
-           <p>
-            <note type="tip" id="Tip-CompareWebSocketOrigins"><ph
-                        conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
-                  /> provides two WebSocket origins to address different needs. For a quick
-                  comparison chart to help you choose the right one, see <xref
-                        href="../Origins/Origins-WebSocketComparison.dita#concept_wz5_jqm_gbb"
-                  />.</note>
-           </p>
+            <p>
+                  <note type="tip" id="Tip-CompareWebSocketOrigins"><ph
+                              conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                        /> provides two WebSocket origins to address different needs. For a quick
+                        comparison chart to help you choose the right one, see <xref
+                              href="../Origins/Origins-WebSocketComparison.dita#concept_wz5_jqm_gbb"
+                        />.</note>
+            </p>
             <p>
                   <draft-comment author="Loretta">Avro-HeaderAttribute - Used in Record Header
                         Attribute type topics for origins with the topic (that process Avro
@@ -1120,11 +1300,10 @@ web-0011.log</codeblock></dd>
             </p>
             <p>
                   <draft-comment author="Loretta"><uicontrol>O-EventHandling-overview</uicontrol> -
-                        used by Directory and File Tail</draft-comment>
+                        used by Directory and File Tail and a lot of other origins</draft-comment>
             </p>
-            <p id="O-EventHandling-overview">The origin can also generate events for an event
-                  stream. For more information about dataflow triggers and the event framework, see
-                        <xref
+            <p id="O-EventHandling-overview">The origin can generate events for an event stream. For
+                  more information about dataflow triggers and the event framework, see <xref
                         href="../Event_Handling/EventFramework-Overview.dita#concept_cph_5h4_lx"/>. </p>
             <p>
                   <draft-comment author="Loretta">Event Generation topic with multiple ph and p used
@@ -1209,7 +1388,7 @@ web-0011.log</codeblock></dd>
             </p>
             <p>
                   <draft-comment author="Loretta">Used by most origins that generate no-more-data in
-                        the Event Generation topic.  Including S3, Directory, JDBC multitable, SQL
+                        the Event Generation topic. Including S3, Directory, JDBC multitable, SQL
                         Server origins. But Salesforce and JDBC Query have their own
                         versions.</draft-comment>
             </p>
@@ -1245,17 +1424,20 @@ web-0011.log</codeblock></dd>
                                     />.</p>
                         </li>
                   </ul></p>
-            <p><ph conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/O-EventGen-xref"
-            /></p>
+            <p><ph
+                        conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/O-EventGen-xref"
+                  /></p>
             <p/>
             <draft-comment author="Loretta">Event Record topics for JDBC Multitable and
                   Salesforce.</draft-comment>
             <p id="p-ERec-NoMoreData">The no-more-data event record includes no record fields.</p>
             <p>
-                  <draft-comment author="Loretta">Origins: used in First File to Process for
-                  </draft-comment>
+                  <draft-comment author="Loretta">D-event-xref</draft-comment>
             </p>
-            <p/>
+            <p><ph id="D-event-xref">The destination can generate events for an event stream. For
+                        more information about the event framework, see <xref
+                              href="../Event_Handling/EventFramework-Overview.dita#concept_cph_5h4_lx"
+                        />.</ph></p>
             <p>
                   <draft-comment author="Loretta">multithreaded stuff below. </draft-comment>
             </p>
@@ -1285,12 +1467,18 @@ web-0011.log</codeblock></dd>
             </p>
             <p>
                   <ul id="Multithread-OriginsList">
+                        <li><xref href="../Origins/AmazonSQS.dita#concept_xsh_knm_5bb">Amazon SQS
+                                    Consumer</xref> - Reads data from queues in Amazon Simple Queue
+                              Services (SQS).</li>
                         <li><xref href="../Origins/AzureEventHub.dita#concept_c1z_15q_1bb">Azure
-                                    Event Hub Consumer</xref> - Reads data from Microsoft Azure
+                                    IoT/Event Hub Consumer</xref> - Reads data from Microsoft Azure
                               Event Hub.</li>
                         <li><xref href="../Origins/CoAPServer.dita#concept_wfy_ghn_sz">CoAP
                                     Server</xref> - Listens on a CoAP endpoint and processes the
                               contents of all authorized CoAP requests.</li>
+                        <li><xref href="../Origins/Directory.dita#concept_qcq_54n_jq"
+                                    >Directory</xref> - Reads fully written files from a
+                              directory.</li>
                         <li><xref href="../Origins/Elasticsearch.dita#concept_f1q_vpm_2z"
                                     >Elasticsearch</xref> - Reads data from an Elasticsearch
                               cluster.</li>
@@ -1308,6 +1496,13 @@ web-0011.log</codeblock></dd>
                               topics in a Kafka cluster.</li>
                         <li><xref href="../Origins/KinConsumer.dita#concept_anh_4y3_yr">Kinesis
                                     Consumer</xref> - Reads data from a Kinesis cluster.</li>
+                        <li><xref href="../Origins/MapRdbCDC.dita#concept_qwj_5vm_pbb">MapR DB
+                                    CDC</xref> - Reads changed MapR DB data that has been written to
+                              MapR Streams.</li>
+                        <li><xref
+                                    href="../Origins/MapRStreamsMultiConsumer.dita#concept_hvd_hww_lbb"
+                                    >MapR Multitopic Streams Consumer</xref> - Reads data from
+                              multiple topics in a MapR Streams cluster.</li>
                         <li><xref href="../Origins/SQLServerCDC.dita#concept_ut3_ywc_v1b">SQL Server
                                     CDC Client</xref> - Reads data from Microsoft SQL Server CDC
                               tables.</li>
@@ -1317,6 +1512,9 @@ web-0011.log</codeblock></dd>
                         <li><xref href="../Origins/TCPServer.dita#concept_ppm_xb1_4z">TCP
                                     Server</xref> - Listens at the specified ports and processes
                               incoming data over TCP/IP connections.</li>
+                        <li><xref href="../Origins/UDPMulti.dita#concept_wng_g5f_5bb">UDP
+                                    Multithreaded Source</xref> - Reads messages from one or more
+                              UDP ports. </li>
                         <li><xref href="../Origins/WebSocketServer.dita#concept_u2r_gpc_3z"
                                     >WebSocket Server</xref> - Listens on a WebSocket endpoint and
                               processes the contents of all authorized WebSocket requests. </li>
@@ -1347,7 +1545,7 @@ web-0011.log</codeblock></dd>
                         Multithreaded Processing</draft-comment>
             </p>
             <p><ph id="HTTPServer-process-ph"><ph id="ph-createsthreads">the origin creates five
-                              threads, and by default <ph
+                              threads, and <ph
                                     conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
                               /> creates a matching number of pipeline runners.</ph>
                         <ph id="ph-Passesbatch">Upon receiving data, the origin passes a batch to
@@ -1373,14 +1571,11 @@ web-0011.log</codeblock></dd>
                         the pipeline.</ph></p>
             <p>
                   <draft-comment author="Loretta">JDBC Consumer, Producer, and Query executor use
-                        the following <uicontrol>ph-JDBCdriver</uicontrol> and
-                              <uicontrol>p-JDBCdriver-link</uicontrol> in Installing the
-                        Driver</draft-comment>
+                        the following <uicontrol>ph-JDBCdriver</uicontrol> and SDCDPM_ExtLib
+                  </draft-comment>
             </p>
             <p><ph id="ph-JDBCdriver">install the JDBC driver for the database. You cannot access
                         the database until you install the required driver. </ph></p>
-            <p id="p-JDBCdriver-link">For more information about installing drivers, see <xref
-                        href="../Configuration/ExternalLibs.dita#concept_pdv_qlw_ft"/>.</p>
             <p>
                   <draft-comment author="Loretta">JDBC Multitable Consumer uses all three DLentries,
                         and SQL Server Change Tracking uses the first two DLentries in the
@@ -1428,13 +1623,40 @@ web-0011.log</codeblock></dd>
                                     pipeline to read the existing data before you start the pipeline
                                     with Oracle CDC Client</ph></ph></ph></p>
             <p>
-                  <draft-comment author="Loretta">The following ph is used by SQL Server CDC Client
-                        - Table Config and Configuring the origin</draft-comment>
+                  <draft-comment author="Loretta">The following phrases and bullets are used by SQL
+                        Server CDC Client - Table Config and Configuring the origin</draft-comment>
             </p>
-            <p><ph id="ph-SpecifyDataTables">When specifying the table names, use the names for the
-                        source tables that contain the data, not the names of the CDC tables. For
-                        example, specify the dbo.customer source table, not the associated CDC
-                        table, cdc.dbo_customer_CT. </ph></p>
+            <ul id="CaptureInstance-Formats">
+                  <li><ph id="format-ChangeInstanceName">To process the CDC tables that match the
+                              specified capture instance name pattern, use the following
+                              format:</ph><codeblock id="code-ChangeInstanceName">&lt;capture instance name pattern></codeblock><p>Use
+                              this format when CDC tables are created based on capture instance
+                              names. You can use the pattern to process a full set of CDC tables or
+                              to exclude some CDC tables from processing. </p><p>For example, say
+                              you have a <codeph>Sales.Accounts</codeph> table with a CDC table
+                              named <codeph>Sales_Accounts_CT</codeph>. After adding several columns
+                              to the table, you create a new CDC table called
+                                    <codeph>Sales_Accounts2_CT</codeph>. </p><p>To process both CDC
+                              tables, you can specify the following capture instance name pattern:
+                                    <codeph>Sales_Accounts%</codeph>. To process only the CDC data
+                              that occurred after the schema change, you can specify the following
+                              capture instance name: <codeph>Sales_Accounts2</codeph>.</p></li>
+                  <li><ph id="format-TableNamePattern">To process all available CDC tables for the
+                              specified data tables, use the following
+                              format:</ph><codeblock id="code-tablenamepattern">&lt;schema name>_&lt;data table name pattern></codeblock><p>Use
+                              this format when CDC tables are created based on data tables instead
+                              of capture instance names. </p><p>For example, to process all
+                              available CDC tables for data tables in a Sales schema, you might use
+                                    <codeph>Sales_%</codeph>. Or, to process the CDC tables
+                              associated with a set of data tables with the Transact prefix, you
+                              might use <codeph>Sales_Transact%</codeph>.</p></li>
+                  <li><ph id="format-AllTables">To process all CDC tables associated with the
+                              schema, use the following format:</ph><p>
+                              <codeblock id="code-AllTables">&lt;schema name>_%</codeblock>
+                        </p><p>For example, to process all tables in the sales schema, enter
+                                    <codeph>sales_%</codeph>.</p></li>
+            </ul>
+            <p/>
             <p>
                   <draft-comment author="Loretta">UDP Source and UDP to Kafka use the following ph
                         and ul:</draft-comment>
@@ -1481,6 +1703,25 @@ web-0011.log</codeblock></dd>
             <p>
                   <draft-comment author="Loretta">PROCESSOR INFO –-</draft-comment>
             </p>
+            <p>
+                  <draft-comment author="Loretta">Used in Configuring topic of any processor that
+                        allows field path expressions.</draft-comment>
+            </p>
+            <p><ph id="ph-FieldPathExp">You can specify individual fields or use a <xref
+                              href="../Pipeline_Configuration/FieldPathExp-Overview.dita#concept_ir4_rxt_3cb"
+                              >field path expression</xref> to specify a set of fields.</ph></p>
+            <p>
+                  <draft-comment author="Loretta">Aggregator processor</draft-comment>
+            </p>
+            <p id="AggregateFunctions">You can use the following aggregate functions:<ul
+                        id="ul_cwn_cff_wbb">
+                        <li>Avg (Integer or Double)</li>
+                        <li>Count (Integer only)</li>
+                        <li>Min (Integer or Double)</li>
+                        <li>Max (Integer or Double)</li>
+                        <li>StdDev (Integer or Double)</li>
+                        <li>Sum (Integer or Double)</li>
+                  </ul></p>
             <p>
                   <draft-comment author="Loretta">Parquet doc - used by HM processor > record header
                         attributes, and Hive Drift > Parquet Processing – the ph is used by the
@@ -1653,26 +1894,28 @@ web-0011.log</codeblock></dd>
                               following methods: </dd>
                         <dd>
                               <ul id="ul_th2_3lr_mx">
-                                    <li id="li_getFieldNull"><codeph>getFieldNull(Record, 'field path')</codeph> - Method
-                                          that checks if a field is assigned a constant such as
-                                          NULL_INTEGER or NULL_STRING.</li>
-                                    <li id="li_createRecord"><codeph>createRecord(String, 'recordId')</codeph> - Method
-                                          that creates a new record with the specified fields and
-                                          values. The recordId uniquely identifies the record. It
-                                          should include enough information to track down the record
-                                          source.</li>
-                                    <li id="li_createMap"><codeph>createMap(boolean listMap)</codeph> - Method that
-                                          creates a map for use as a field in a record. Pass true to
-                                          create a list-map field, or false to create a map
-                                          field.</li>
-                                    <li id="li_createEvent"><codeph>createEvent(String type, int version)</codeph> -
-                                          Method that creates a new event record with the specified
-                                          event type and version. Be sure to enable event generation
-                                          in the stage before implementing event methods. </li>
-                                    <li id="li_toEvent"><codeph>toEvent(Record)</codeph> - Method that sends an
-                                          event record to the Event output stream. Be sure to enable
-                                          event generation in the stage before implementing event
-                                          methods. </li>
+                                    <li id="li_getFieldNull"><codeph>getFieldNull(Record, 'field
+                                                path')</codeph> - Method that checks if a field is
+                                          assigned a constant such as NULL_INTEGER or
+                                          NULL_STRING.</li>
+                                    <li id="li_createRecord"><codeph>createRecord(String,
+                                                'recordId')</codeph> - Method that creates a new
+                                          record with the specified fields and values. The recordId
+                                          uniquely identifies the record. It should include enough
+                                          information to track down the record source.</li>
+                                    <li id="li_createMap"><codeph>createMap(boolean
+                                                listMap)</codeph> - Method that creates a map for
+                                          use as a field in a record. Pass true to create a list-map
+                                          field, or false to create a map field.</li>
+                                    <li id="li_createEvent"><codeph>createEvent(String type, int
+                                                version)</codeph> - Method that creates a new event
+                                          record with the specified event type and version. Be sure
+                                          to enable event generation in the stage before
+                                          implementing event methods. </li>
+                                    <li id="li_toEvent"><codeph>toEvent(Record)</codeph> - Method
+                                          that sends an event record to the Event output stream. Be
+                                          sure to enable event generation in the stage before
+                                          implementing event methods. </li>
                                     <li id="li_pipelineParams"><codeph>pipelineParameters()</codeph>
                                           - Method that returns a map of all <xref
                                                 href="../Pipeline_Configuration/RuntimeParameters.dita#concept_rjh_ntz_qr"
@@ -1708,7 +1951,8 @@ input_stream.read()</codeblock></p>
                                           is used only by Flume. <b>AvroFile</b> used by Hadoop FS,
                                           Local and S3, and other file destinations.
                                                 <b>AvroKafka</b> used by Kafka. <b>AvroMess</b> used
-                                          by Kinesis Producer and other message destinations. </draft-comment>
+                                          by Kinesis Producer and other message destinations.
+                                    </draft-comment>
                               </dd>
                         </dlentry>
                   </dl>
@@ -1819,7 +2063,8 @@ input_stream.read()</codeblock></p>
                                                 message.</p></li>
                                     </ul>
                               </dd>
-                              <dd>You can compress data with an Avro-supported compression codec. </dd>
+                              <dd>You can compress data with an Avro-supported compression codec.
+                              </dd>
                         </dlentry>
                   </dl>
                   <draft-comment author="alisontaylor">Avro other message destinations. LC: removed
@@ -1955,8 +2200,7 @@ input_stream.read()</codeblock></p>
                               file and pass checksum information to the destination system in an
                               event record. </dd>
                         <dd>For more information about the whole file data format, see <xref
-                                    href="../Data_Formats/WholeFile.dita#concept_nfc_qkh_xw"
-                              />.</dd>
+                                    href="../Data_Formats/WholeFile.dita#concept_nfc_qkh_xw"/>.</dd>
                   </dlentry>
                   <dlentry id="D-DF-WholeF-Basic">
                         <dt>Whole File</dt>
@@ -1971,8 +2215,7 @@ input_stream.read()</codeblock></p>
                               file and pass checksum information to the destination system in an
                               event record. </dd>
                         <dd>For more information about the whole file data format, see <xref
-                                    href="../Data_Formats/WholeFile.dita#concept_nfc_qkh_xw"
-                              />.</dd>
+                                    href="../Data_Formats/WholeFile.dita#concept_nfc_qkh_xw"/>.</dd>
                   </dlentry>
                   <dlentry id="D-DF-WholeF-noEvent">
                         <dt>Whole File</dt>
@@ -1984,8 +2227,7 @@ input_stream.read()</codeblock></p>
                               destination system. You can specify an expression that defines access
                               permissions. </dd>
                         <dd>For more information about the whole file data format, see <xref
-                                    href="../Data_Formats/WholeFile.dita#concept_nfc_qkh_xw"
-                              />.</dd>
+                                    href="../Data_Formats/WholeFile.dita#concept_nfc_qkh_xw"/>.</dd>
                   </dlentry>
                   <dlentry id="D-DF-WholeF-HDFS">
                         <dt>Whole File</dt>
@@ -2003,8 +2245,7 @@ input_stream.read()</codeblock></p>
                                     Type</wintitle> property to <uicontrol>Whole
                               File</uicontrol>.</dd>
                         <dd>For more information about the whole file data format, see <xref
-                                    href="../Data_Formats/WholeFile.dita#concept_nfc_qkh_xw"
-                              />.</dd>
+                                    href="../Data_Formats/WholeFile.dita#concept_nfc_qkh_xw"/>.</dd>
                   </dlentry>
             </dl>
             <p>
@@ -2047,8 +2288,8 @@ input_stream.read()</codeblock></p>
                         reused content - used in Avro &amp; Parquet implementation. </draft-comment>
             </p>
             <p><ph id="HD-BasicImp-ph">the origin of your choice, the Hive Metadata processor
-                        connnected to the Hive Metastore destination to perform metadata updates,
-                        and to either the Hadoop FS or MapR FS destination to process data</ph></p>
+                        connected to the Hive Metastore destination to perform metadata updates, and
+                        to either the Hadoop FS or MapR FS destination to process data</ph></p>
             <p>As with Avro data, the <ph id="HD-DataStream-ph">Hive Metadata processor passes
                         records through the first output stream - the data stream. Connect the data
                         stream to the Hadoop FS or MapR FS destination to write data to the
@@ -2072,12 +2313,12 @@ input_stream.read()</codeblock></p>
                         to a table changes, like adding a couple new fields, the destination updates
                         the table so the record can be written to it.</ph></p>
             <p id="HD-CStudy-HDFS">To write data to Hive using record header attributes, you can use
-                  the Hadoop FS or MapR FS destinations. We'll use Hadoop FS destination.  </p>
+                  the Hadoop FS or MapR FS destinations. We'll use Hadoop FS destination. </p>
             <p id="HD-CStudy-HDFSuseatts">When you configure the destination, instead of configuring
                   a directory template, you configure the destination to use the directory in the
                   record header. Configure the destination to roll files when it sees a "roll"
                   attribute in the record header, and when configuring the Avro properties, indicate
-                  that the schema is in the record header.  </p>
+                  that the schema is in the record header. </p>
             <p id="HD-CStudy-HDFSprocessing-p"><ph id="HD-CStudy-HDFSprocessing-ph">With this
                         configuration, the destination uses the information in record header
                         attributes to write data to HDFS. It writes each record to the directory in
@@ -2110,13 +2351,13 @@ input_stream.read()</codeblock></p>
             </p>
             <p id="EXP-p1">Use the expression language to configure expressions and conditions in
                   processors, such as the Expression Evaluator or Stream Selector. Some destination
-                  properties also require the expression language, such as the directory template
-                  for Hadoop FS or Local FS. </p>
-            <p id="EXP-p2">Optionally, you can use the expression language to define any stage or
-                  pipeline property that represents a numeric or string value. This allows you to
-                  use runtime parameters or runtime properties throughout the pipeline. You can use
-                  expression completion to determine where you can use an expression and the
-                  expression elements that you can use in that location. </p>
+                  properties also allow the expression language, such as the directory template for
+                  the Hadoop FS destination. </p>
+            <p id="EXP-p2">You can use the expression language to define any stage or pipeline
+                  property that represents a numeric or string value. You can also use field path
+                  expressions to select the fields to use in some processors. </p>
+            <p id="EXP-p2.2">Use expression completion to determine where you can use an expression
+                  and the expression elements that you can use in that location. </p>
             <p id="EXP-p3">You can use the following elements in an expression:<ul
                         id="ul_w34_vxl_2s">
                         <li>Constants</li>
@@ -2160,7 +2401,11 @@ input_stream.read()</codeblock></p>
                   /> user. When this property is not set, you can specify a user in the origin. For
                   more information about Hadoop impersonation and the Data Collector property, see
                         <xref
-                        href="../Configuration/HadoopImpersonationMode.dita#concept_pmr_sy5_nz"/>. </p>
+                        href="../Configuration/HadoopImpersonationMode.dita#concept_pmr_sy5_nz"
+                        product="SDC"/><ph product="DPM"><xref
+                              href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/DCConfig.html%23concept_pmr_sy5_nz"
+                              format="html" scope="external">Hadoop Impersonation Mode</xref> in the
+                        Data Collector documentation</ph>. </p>
             <p>Note that the origin <ph id="HUser-ConnectUser">uses a different user account to
                         connect to HDFS. <ph id="HUser-ConnectGeneric">By default, <ph
                                     conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
@@ -2761,15 +3006,19 @@ ${YY()}_${MM()}_${DD()}</codeblock>
             </p>
             <p id="MapRPrereq">Before you use any MapR stage in a pipeline, you must perform
                   additional steps to enable <ph conref="#concept_vhs_5tz_xp/pName-long"/> to
-                  process MapR data. For more information, see <xref
-                        href="../Installation/MapR-Prerequisites.dita#concept_jgs_qpg_2v"/>.</p>
+                  process MapR data. <ph conref="#concept_vhs_5tz_xp/SDCDPM_MapRPrereq"/></p>
+            <draft-comment author="alisontaylor">MapRPrereq-Stats - Used in Write Statistics to MapR
+                  Streams.</draft-comment>
+            <p id="MapRPrereq-Stats">Before you can write statistics to MapR Streams, you must
+                  perform additional steps to enable <ph conref="#concept_vhs_5tz_xp/pName-long"/>
+                  to process MapR data. <ph conref="#concept_vhs_5tz_xp/SDCDPM_MapRPrereq"/></p>
             <draft-comment author="alisontaylor">MapR-PrereqHiveStream - Use in Hive Streaming
                   destination for MapR library to make sure they configure SDC.</draft-comment>
             <p id="MapRPrereqHiveStream">Before you use the Hive Streaming destination with the MapR
                   library in a pipeline, you must perform additional steps to enable <ph
-                        conref="#concept_vhs_5tz_xp/pName-long"/> to process MapR data. For more
-                  information, see <xref
-                        href="../Installation/MapR-Prerequisites.dita#concept_jgs_qpg_2v"/>. </p>
+                        conref="#concept_vhs_5tz_xp/pName-long"/> to process MapR data. <ph
+                        conref="#concept_vhs_5tz_xp/SDCDPM_MapRPrereq"/>
+            </p>
             <draft-comment author="alisontaylor">Two versions of Lookup Cache below. Be sure to make
                   the same updates to both.</draft-comment>
             <draft-comment author="alisontaylor">Lookup Cache - used for Redis Lookup and HBase
@@ -2905,46 +3154,66 @@ ${YY()}_${MM()}_${DD()}</codeblock>
                         <uicontrol>Tip_AccessKeys</uicontrol> used in AWS Credentials topic for AWS
                   stages. <uicontrol>Tip_Passwords</uicontrol> used in keystore/truststore password
                   properties for all stages.</draft-comment>
-            <note type="tip" id="Tip_Usernames_JDBC">To secure sensitive information such as usernames and passwords, you
-                  can use <xref href="../Configuration/CredentialStores.dita#concept_bt1_bpj_r1b"
-                        >credential stores</xref> or <xref
+            <note type="tip" id="SDCDPM_Tip_Usernames">To secure sensitive information such as
+                  usernames and passwords, you can use <xref
                         href="../Pipeline_Configuration/RuntimeResources.dita#concept_bs4_5nm_2s"
-                        >runtime resources</xref>. </note>
-            <note type="tip" id="Tip_Usernames">To secure sensitive information such as usernames
-                  and passwords, you can use <xref
-                        href="../Configuration/Vault-Overview.dita#concept_bmq_gl1_mw">Hashicorp
-                        Vault secrets</xref> or <xref
+                        >runtime resources</xref> or <ph product="SDC"><xref
+                              href="../Configuration/CredentialStores.dita#concept_bt1_bpj_r1b"
+                              >credential stores.</xref></ph><ph product="DPM">credential stores.
+                        For more information about credential stores, see <xref
+                              href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/CredentialStores.html"
+                              format="html" scope="external">Credential Stores</xref> in the Data
+                        Collector documentation.</ph></note>
+            <note type="tip" id="SDCDPM_Tip_AccessKeys">To secure sensitive information such as
+                  access key pairs, you can use <xref
                         href="../Pipeline_Configuration/RuntimeResources.dita#concept_bs4_5nm_2s"
-                        >runtime resources</xref>. </note>
-            <note type="tip" id="Tip_AccessKeys">To secure sensitive information such as access key
-                  pairs, you can use <xref
-                        href="../Configuration/Vault-Overview.dita#concept_bmq_gl1_mw">Hashicorp
-                        Vault secrets</xref> or <xref
+                        >runtime resources</xref> or <ph product="SDC"><xref
+                              href="../Configuration/CredentialStores.dita#concept_bt1_bpj_r1b"
+                              >credential stores.</xref></ph><ph product="DPM">credential stores.
+                        For more information about credential stores, see <xref
+                              href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/CredentialStores.html"
+                              format="html" scope="external">Credential Stores</xref> in the Data
+                        Collector documentation.</ph></note>
+            <note type="tip" id="SDCDPM_Tip_Passwords">To secure sensitive information such as
+                  passwords, you can use <xref
                         href="../Pipeline_Configuration/RuntimeResources.dita#concept_bs4_5nm_2s"
-                        >runtime resources</xref>. </note>
-            <note type="tip" id="Tip_Passwords">To secure sensitive information such as passwords,
-                  you can use <xref href="../Configuration/Vault-Overview.dita#concept_bmq_gl1_mw"
-                        >Hashicorp Vault secrets</xref> or <xref
-                        href="../Pipeline_Configuration/RuntimeResources.dita#concept_bs4_5nm_2s"
-                        >runtime resources</xref>. </note>
-            <note type="tip" id="Tip_ConsumerKey">To secure sensitive information such as the
+                        >runtime resources</xref> or <ph product="SDC"><xref
+                              href="../Configuration/CredentialStores.dita#concept_bt1_bpj_r1b"
+                              >credential stores.</xref></ph><ph product="DPM">credential stores.
+                        For more information about credential stores, see <xref
+                              href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/CredentialStores.html"
+                              format="html" scope="external">Credential Stores</xref> in the Data
+                        Collector documentation.</ph></note>
+            <note type="tip" id="SDCDPM_Tip_ConsumerKey">To secure sensitive information such as the
                   consumer key and secret, you can use <xref
-                        href="../Configuration/Vault-Overview.dita#concept_bmq_gl1_mw">Hashicorp
-                        Vault secrets</xref> or <xref
                         href="../Pipeline_Configuration/RuntimeResources.dita#concept_bs4_5nm_2s"
-                        >runtime resources</xref>. </note>
-            <note type="tip" id="Tip_ClientID">To secure sensitive information such as the client ID
-                  and secret, you can use <xref
-                        href="../Configuration/Vault-Overview.dita#concept_bmq_gl1_mw">Hashicorp
-                        Vault secrets</xref> or <xref
+                        >runtime resources</xref> or <ph product="SDC"><xref
+                              href="../Configuration/CredentialStores.dita#concept_bt1_bpj_r1b"
+                              >credential stores.</xref></ph><ph product="DPM">credential stores.
+                        For more information about credential stores, see <xref
+                              href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/CredentialStores.html"
+                              format="html" scope="external">Credential Stores</xref> in the Data
+                        Collector documentation.</ph></note>
+            <note type="tip" id="SDCDPM_Tip_ClientID">To secure sensitive information such as the
+                  client ID and secret, you can use <xref
                         href="../Pipeline_Configuration/RuntimeResources.dita#concept_bs4_5nm_2s"
-                        >runtime resources</xref>. </note>
-            <note type="tip" id="Tip_JWTKey">To secure sensitive information such as the JWT signing
-                  key, you can use <xref
-                        href="../Configuration/Vault-Overview.dita#concept_bmq_gl1_mw">Hashicorp
-                        Vault secrets</xref> or <xref
+                        >runtime resources</xref> or <ph product="SDC"><xref
+                              href="../Configuration/CredentialStores.dita#concept_bt1_bpj_r1b"
+                              >credential stores.</xref></ph><ph product="DPM">credential stores.
+                        For more information about credential stores, see <xref
+                              href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/CredentialStores.html"
+                              format="html" scope="external">Credential Stores</xref> in the Data
+                        Collector documentation.</ph></note>
+            <note type="tip" id="SDCDPM_Tip_JWTKey">To secure sensitive information such as the JWT
+                  signing key, you can use <xref
                         href="../Pipeline_Configuration/RuntimeResources.dita#concept_bs4_5nm_2s"
-                        >runtime resources</xref>. </note>
+                        >runtime resources</xref> or <ph product="SDC"><xref
+                              href="../Configuration/CredentialStores.dita#concept_bt1_bpj_r1b"
+                              >credential stores.</xref></ph><ph product="DPM">credential stores.
+                        For more information about credential stores, see <xref
+                              href="https://streamsets.com/documentation/datacollector/latest/help/#Configuration/CredentialStores.html"
+                              format="html" scope="external">Credential Stores</xref> in the Data
+                        Collector documentation.</ph></note>
             <p>
                   <draft-comment author="Loretta">Cluster mode: MapR Streaming mode and Kafka (Yarn)
                         requirements:</draft-comment>
@@ -3004,6 +3273,7 @@ ${YY()}_${MM()}_${DD()}</codeblock>
                         events:<ul id="ul_l51_mvd_nx">
                         <li>Amazon S3 origin</li>
                         <li>Directory origin</li>
+                        <li>Google Cloud Storage origin</li>
                         <li>JDBC Query Consumer origin</li>
                         <li>JDBC Multitable Consumer origin</li>
                         <li>Salesforce origin</li>
@@ -3033,7 +3303,11 @@ ${YY()}_${MM()}_${DD()}</codeblock>
                         documentation. For more information about the stage libraries that include
                         the Spark Evaluator, see <xref
                               href="../Installation/AvailableStageLibraries.dita#concept_evs_xkm_s5"
-                        />.</ph></p>
+                              product="SDC"/><ph product="DPM"><xref
+                                    href="https://streamsets.com/documentation/datacollector/latest/help/#Installation/AddtionalStageLibs.html%23concept_evs_xkm_s5"
+                                    format="html" scope="external">Available Stage Libraries</xref>
+                              in the <ph conref="#concept_vhs_5tz_xp/pName-long"/>
+                              documentation</ph>.</ph></p>
             <p>
                   <draft-comment author="Loretta">Used by Spark Evaluator > Installing the
                         Application and Config > Install External Libraries.</draft-comment>
@@ -3114,11 +3388,12 @@ ${YY()}_${MM()}_${DD()}</codeblock>
                         header, JDBC Query Consumer > CDC header, </draft-comment>
             </p>
             <p id="CDC-UseCDCdest">If you use a CRUD-enabled destination in the pipeline such as
-                  JDBC Producer or Kudu, the destination can use the operation type when writing to
-                  destination systems. When necessary, you can use an Expression Evaluator or
-                  scripting processors to manipulate the value in the sdc.operation.type header
-                  attribute. For an overview of <ph conref="#concept_vhs_5tz_xp/pName-long"/>
-                  changed data processing and a list of CRUD-enabled destinations, see <xref
+                  JDBC Producer or Elasticsearch, the destination can use the operation type when
+                  writing to destination systems. When necessary, you can use an Expression
+                  Evaluator or scripting processors to manipulate the value in the
+                  sdc.operation.type header attribute. For an overview of <ph
+                        conref="#concept_vhs_5tz_xp/pName-long"/> changed data processing and a list
+                  of CRUD-enabled destinations, see <xref
                         href="../Pipeline_Design/CDC-Overview.dita#concept_apw_l2c_ty"/>.</p>
             <p/>
             <draft-comment author="Loretta">CRUD-dest-def is used in Processing Changed Data
@@ -3248,9 +3523,9 @@ ${YY()}_${MM()}_${DD()}</codeblock>
             <draft-comment author="alisontaylor">Note used 2 times in Aggregated Statistics for
                   Pipelines in DPM chapter</draft-comment>
             <note type="important" id="AggStatsNote">For a production environment, use a Kafka
-                  cluster or Amazon Kinesis Streams to aggregate statistics. Using SDC RPC to
-                  aggregate statistics is not highly available and might cause the loss of some
-                  data. It should be used for development purposes only.</note>
+                  cluster, Amazon Kinesis Streams, or MapR Streams to aggregate statistics. Using
+                  SDC RPC to aggregate statistics is not highly available and might cause the loss
+                  of some data. It should be used for development purposes only.</note>
             <p>
                   <draft-comment author="Loretta">This ph-PermissionsDisabled is used in Permissions
                         overview and Config the Data Collector.</draft-comment>
@@ -3272,14 +3547,14 @@ ${YY()}_${MM()}_${DD()}</codeblock>
                   <li>JDBC Lookup processor</li>
                   <li>JDBC Tee processor</li>
                   <li>JDBC Producer destination</li>
+                  <li>JMS Producer destination</li>
                   <li>JDBC Query executor</li>
             </ul>
             <draft-comment author="alisontaylor">Use this for any location in the help that mentions
                   these environment variable files.</draft-comment>
-            <p id="EnvFileLocation">If you start Data Collector as a service, set the environment
-                  variable in the <systemoutput>$SDC_DIST/libexec/sdcd-env.sh</systemoutput> file.
-                  If you start Data Collector manually, set the variable in the
-                        <systemoutput>$SDC_DIST/libexec/sdc-env.sh</systemoutput> file.</p>
+            <p id="EnvFileLocation">Modify the <xref
+                        href="../Configuration/DCEnvironmentConfig.dita#concept_rng_qym_qr"
+                        >environment configuration file</xref> used by your installation type.</p>
             <draft-comment author="alisontaylor">Use this for the pipeline --name option for any
                   commands in the CLI docs</draft-comment>
             <p id="CliPipelineName"><ph
@@ -3355,8 +3630,9 @@ gcloud iam service-accounts keys create key.json --iam-account=my-account@my-pro
                                           /> machine. </li>
                                     <li>In the <ph
                                                 conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
-                                          /> environment configuration file, add the
-                                                <codeph>GOOGLE_APPLICATION_CREDENTIALS</codeph>
+                                          /> environment configuration file located in the
+                                                <codeph>$SDC_DIST/libexec</codeph> directory, add
+                                          the <codeph>GOOGLE_APPLICATION_CREDENTIALS</codeph>
                                           environment variable and point it to the credentials
                                                 file.<p
                                                 conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/EnvFileLocation"
@@ -3387,11 +3663,12 @@ gcloud iam service-accounts keys create key.json --iam-account=my-account@my-pro
                                                   service account credential</xref> in the Google
                                                 Cloud Platform documentation.</p></li>
                                     <li>Store the generated credentials file on the <ph
-                                          conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
-                                    /> machine. <p>As a best practice, store the file in the <ph
-                                          conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
-                                    /> resources directory, <codeph>$SDC_RESOURCES</codeph>.
-                                    </p></li>
+                                                conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                                          /> machine. <p>As a best practice, store the file in the
+                                                  <ph
+                                                  conref="../Reusable_Content/ReusablePhrases.dita#concept_vhs_5tz_xp/pName-long"
+                                                /> resources directory,
+                                                  <codeph>$SDC_RESOURCES</codeph>. </p></li>
                                     <li>On the <uicontrol>Credentials</uicontrol> tab for the stage,
                                           select <uicontrol>Service Account Credentials
                                                 File</uicontrol> for the credentials provider and

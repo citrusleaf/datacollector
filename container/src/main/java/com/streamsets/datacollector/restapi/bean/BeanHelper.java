@@ -30,6 +30,9 @@ import com.streamsets.datacollector.config.PipelineDefinition;
 import com.streamsets.datacollector.config.PipelineRulesDefinition;
 import com.streamsets.datacollector.config.RawSourceDefinition;
 import com.streamsets.datacollector.config.RuleDefinitions;
+import com.streamsets.datacollector.config.ServiceConfiguration;
+import com.streamsets.datacollector.config.ServiceDefinition;
+import com.streamsets.datacollector.config.ServiceDependencyDefinition;
 import com.streamsets.datacollector.config.StageConfiguration;
 import com.streamsets.datacollector.config.StageDefinition;
 import com.streamsets.datacollector.config.StageType;
@@ -57,6 +60,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BeanHelper {
   private BeanHelper() {}
@@ -365,6 +369,16 @@ public class BeanHelper {
       stageDefinitionJsonList.add(new StageDefinitionJson(s));
     }
     return stageDefinitionJsonList;
+  }
+
+  public static List<ServiceDefinitionJson> wrapServiceDefinitions(List<ServiceDefinition> serviceDefinitions) {
+    if(serviceDefinitions == null) {
+      return null;
+    }
+
+    return serviceDefinitions.stream()
+      .map(ServiceDefinitionJson::new)
+      .collect(Collectors.toCollection(ArrayList::new));
   }
 
   public static List<RuleIssueJson> wrapRuleIssues(List<com.streamsets.datacollector.validation.RuleIssue> ruleIssues) {
@@ -838,6 +852,8 @@ public class BeanHelper {
         return MetricElementJson.HISTOGRAM_MEAN;
       case HISTOGRAM_MEDIAN:
         return MetricElementJson.HISTOGRAM_MEDIAN;
+      case HISTOGRAM_P50:
+        return MetricElementJson.HISTOGRAM_P50;
       case HISTOGRAM_P75:
         return MetricElementJson.HISTOGRAM_P75;
       case HISTOGRAM_P95:
@@ -947,6 +963,8 @@ public class BeanHelper {
         return MetricElement.HISTOGRAM_MEAN;
       case HISTOGRAM_MEDIAN:
         return MetricElement.HISTOGRAM_MEDIAN;
+      case HISTOGRAM_P50:
+        return MetricElement.HISTOGRAM_P50;
       case HISTOGRAM_P75:
         return MetricElement.HISTOGRAM_P75;
       case HISTOGRAM_P95:
@@ -1268,5 +1286,30 @@ public class BeanHelper {
       json.add(new SupportBundleContentDefinitionJson(def));
     }
     return json;
+  }
+
+  public static List<ServiceDependencyDefinitionJson> wrapServiceDependencyDefinitions(List<ServiceDependencyDefinition> services) {
+    return services.stream()
+      .map(ServiceDependencyDefinitionJson::new)
+      .collect(Collectors.toList());
+  }
+
+  public static List<ServiceConfigurationJson> wrapServiceConfiguration(List<ServiceConfiguration> services) {
+    if (null == services) {
+      return null;
+    }
+    return services.stream()
+      .map(ServiceConfigurationJson::new)
+      .collect(Collectors.toList());
+  }
+
+  public static List<ServiceConfiguration> unwrapServiceConfiguration(List<ServiceConfigurationJson> services) {
+    if(services == null) {
+      return null;
+    }
+
+    return services.stream()
+      .map(ServiceConfigurationJson::getServiceConfiguration)
+      .collect(Collectors.toList());
   }
 }

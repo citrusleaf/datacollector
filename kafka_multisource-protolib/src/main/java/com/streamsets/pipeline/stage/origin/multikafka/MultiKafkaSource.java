@@ -19,6 +19,7 @@ import com.google.common.base.Throwables;
 import com.streamsets.pipeline.api.BatchContext;
 import com.streamsets.pipeline.api.Field;
 import com.streamsets.pipeline.api.Record;
+import com.streamsets.pipeline.api.Stage;
 import com.streamsets.pipeline.api.StageException;
 import com.streamsets.pipeline.api.base.BasePushSource;
 import com.streamsets.pipeline.api.base.OnRecordErrorException;
@@ -33,9 +34,9 @@ import com.streamsets.pipeline.stage.common.DefaultErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.ErrorRecordHandler;
 import com.streamsets.pipeline.stage.common.HeaderAttributeConstants;
 import com.streamsets.pipeline.stage.origin.multikafka.loader.KafkaConsumerLoader;
+import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,8 +83,6 @@ public class MultiKafkaSource extends BasePushSource {
         MultiSdcKafkaConsumer<String, byte[]> consumer,
         CountDownLatch startProcessingGate
     ) {
-      Thread.currentThread().setName("kafkaConsumerThread-"+threadID);
-      LOG.trace("Thread {} begin", Thread.currentThread().getName());
       this.consumer = consumer;
       this.threadID = threadID;
       this.topicList = topicList;
@@ -92,12 +91,14 @@ public class MultiKafkaSource extends BasePushSource {
 
     @Override
     public Long call() throws Exception {
-      LOG.trace("Starting poll loop in thread {}", Thread.currentThread().getName());
+      Thread.currentThread().setName("kafkaConsumerThread-"+threadID);
       long messagesProcessed = 0;
 
       //wait until all threads are spun up before processing
+      LOG.debug("Thread {} waiting on other consumer threads to start up", Thread.currentThread().getName());
       startProcessingGate.await();
 
+      LOG.debug("Starting poll loop in thread {}", Thread.currentThread().getName());
       try {
         consumer.subscribe(topicList);
 
@@ -242,11 +243,13 @@ public class MultiKafkaSource extends BasePushSource {
       try {
         futures.add(executor.submit(new MultiTopicCallable(i,
             conf.topicList,
-            KafkaConsumerLoader.createConsumer(getKafkaProperties()),
+            KafkaConsumerLoader.createConsumer(getKafkaProperties(getContext())),
             startProcessingGate
         )));
       } catch (Exception e) {
-        LOG.error("{}", e);
+        LOG.error("Error while initializing Kafka consumer: {}", e.toString(), e);
+        Throwables.propagateIfPossible(e.getCause(), StageException.class);
+        Throwables.propagate(e);
       }
       startProcessingGate.countDown();
     }
@@ -273,7 +276,7 @@ public class MultiKafkaSource extends BasePushSource {
   }
 
   //no trespassing...
-  private Properties getKafkaProperties() {
+  private Properties getKafkaProperties(Stage.Context context) {
     Properties props = new Properties();
     props.putAll(conf.kafkaOptions);
 
@@ -284,6 +287,11 @@ public class MultiKafkaSource extends BasePushSource {
     props.setProperty("auto.commit.interval.ms", "1000");
     props.setProperty(KafkaConstants.KEY_DESERIALIZER_CLASS_CONFIG, conf.keyDeserializer.getKeyClass());
     props.setProperty(KafkaConstants.VALUE_DESERIALIZER_CLASS_CONFIG, conf.valueDeserializer.getValueClass());
+    props.setProperty(KafkaConstants.CONFLUENT_SCHEMA_REGISTRY_URL_CONFIG, StringUtils.join(conf.dataFormatConfig.schemaRegistryUrls, ","));
+
+    if(context.isPreview()) {
+      props.setProperty(KafkaConstants.AUTO_OFFSET_RESET_CONFIG, KafkaConstants.AUTO_OFFSET_RESET_PREVIEW_VALUE);
+    }
 
     return props;
   }

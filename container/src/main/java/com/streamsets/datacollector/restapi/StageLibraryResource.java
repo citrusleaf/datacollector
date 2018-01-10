@@ -17,8 +17,10 @@ package com.streamsets.datacollector.restapi;
 
 
 import com.google.common.annotations.VisibleForTesting;
+import com.streamsets.datacollector.classpath.ClasspathValidatorResult;
 import com.streamsets.datacollector.config.CredentialStoreDefinition;
 import com.streamsets.datacollector.config.LineagePublisherDefinition;
+import com.streamsets.datacollector.config.ServiceDefinition;
 import com.streamsets.datacollector.config.StageDefinition;
 import com.streamsets.datacollector.definition.ELDefinitionExtractor;
 import com.streamsets.datacollector.el.RuntimeEL;
@@ -143,6 +145,10 @@ public class StageLibraryResource {
     List<PipelineDefinitionJson> pipeline = new ArrayList<>(1);
     pipeline.add(BeanHelper.wrapPipelineDefinition(stageLibrary.getPipeline()));
     definitions.setPipeline(pipeline);
+
+    // Populate service definitions
+    List<ServiceDefinition> serviceDefinitions = stageLibrary.getServiceDefinitions();
+    definitions.setServices(BeanHelper.wrapServiceDefinitions(serviceDefinitions));
 
     //Populate the definitions with the PipelineRulesDefinition
     List<PipelineRulesDefinitionJson> pipelineRules = new ArrayList<>(1);
@@ -484,4 +490,17 @@ public class StageLibraryResource {
     return Response.ok().build();
   }
 
+  @GET
+  @Path("/stageLibraries/classpathHealth")
+  @ApiOperation(
+    value = "Validate health of classpath of all loaded stages.",
+    response = Object.class,
+    authorizations = @Authorization(value = "basic")
+  )
+  @RolesAllowed({AuthzRole.ADMIN, AuthzRole.ADMIN_REMOTE})
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response classpathHealth() {
+    List<ClasspathValidatorResult> results = stageLibrary.validateStageLibClasspath();
+    return Response.ok().entity(results).build();
+  }
 }

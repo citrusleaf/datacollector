@@ -20,7 +20,6 @@ import com.streamsets.pipeline.api.ListBeanModel;
 import com.streamsets.pipeline.api.PushSource;
 import com.streamsets.pipeline.api.Stage;
 import com.streamsets.pipeline.api.ValueChooserModel;
-import com.streamsets.pipeline.config.TimeZoneChooserValues;
 import com.streamsets.pipeline.lib.jdbc.JdbcErrors;
 import com.streamsets.pipeline.lib.jdbc.multithread.BatchTableStrategy;
 import com.streamsets.pipeline.lib.jdbc.multithread.BatchTableStrategyChooserValues;
@@ -94,18 +93,6 @@ public class CDCTableJdbcConfigBean {
       triggeredByValue = "SWITCH_TABLES"
   )
   public int resultCacheSize;
-
-  @ConfigDef(
-      required = true,
-      type = ConfigDef.Type.MODEL,
-      defaultValue = "UTC",
-      label = "Data Time Zone",
-      description = "Time zone to use to resolve time based expressions",
-      displayPosition = 200,
-      group = "JDBC"
-  )
-  @ValueChooserModel(TimeZoneChooserValues.class)
-  public String timeZoneID;
 
   @ConfigDef(
       required = true,

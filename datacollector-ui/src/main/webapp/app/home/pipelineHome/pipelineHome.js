@@ -570,8 +570,8 @@ angular
        * @param instanceName
        */
       onIssueClick: function(issue, instanceName) {
-        var pipelineConfig = $scope.pipelineConfig,
-          stageInstance;
+        var pipelineConfig = $scope.pipelineConfig;
+        var stageInstance;
 
         if (instanceName) {
           //Select stage instance
@@ -610,8 +610,8 @@ angular
               configName: issue.configName,
               statsAggregatorStage: true
             });
-          } else if (pipelineConfig.startEventStage[0] &&
-            pipelineConfig.startEventStage[0].instanceName === instanceName){
+          } else if (pipelineConfig.startEventStages[0] &&
+            pipelineConfig.startEventStages[0].instanceName === instanceName){
             //StartEvent Stage Configuration Issue
             $scope.$broadcast('selectNode');
             $scope.changeStageSelection({
@@ -622,8 +622,8 @@ angular
               configName: issue.configName,
               startEventStage: true
             });
-          } else if (pipelineConfig.stopEventStage[0] &&
-            pipelineConfig.stopEventStage[0].instanceName === instanceName){
+          } else if (pipelineConfig.stopEventStages[0] &&
+            pipelineConfig.stopEventStages[0].instanceName === instanceName){
             //StopEvent Stage Configuration Issue
             $scope.$broadcast('selectNode');
             $scope.changeStageSelection({
@@ -806,27 +806,6 @@ angular
         //Definitions
         $scope.pipelineConfigDefinition = pipelineService.getPipelineConfigDefinition();
         $scope.stageLibraries = pipelineService.getStageDefinitions();
-
-        $scope.sources = _.filter($scope.stageLibraries, function (stageLibrary) {
-          return stageLibrary.type === pipelineConstant.SOURCE_STAGE_TYPE &&
-            stageLibrary.library !== 'streamsets-datacollector-stats-lib';
-        });
-
-        $scope.processors = _.filter($scope.stageLibraries, function (stageLibrary) {
-          return stageLibrary.type === pipelineConstant.PROCESSOR_STAGE_TYPE &&
-            stageLibrary.library !== 'streamsets-datacollector-stats-lib';
-        });
-
-        $scope.executors = _.filter($scope.stageLibraries, function (stageLibrary) {
-          return (stageLibrary.type === pipelineConstant.EXECUTOR_STAGE_TYPE &&
-          stageLibrary.library !== 'streamsets-datacollector-stats-lib');
-        });
-
-        $scope.targets = _.filter($scope.stageLibraries, function (stageLibrary) {
-          return (stageLibrary.type === pipelineConstant.TARGET_STAGE_TYPE &&
-          !stageLibrary.errorStage && !stageLibrary.statsAggregatorStage  &&
-          stageLibrary.library !== 'streamsets-datacollector-stats-lib');
-        });
 
         //Pipelines
 
@@ -1145,6 +1124,35 @@ angular
       $scope.pipelineConfig = pipelineConfig || {};
       $scope.activeConfigInfo = $rootScope.$storage.activeConfigInfo = pipelineConfig.info;
       $scope.pipelineRules = pipelineRules;
+      var executionModeConfig = _.find($scope.pipelineConfig.configuration, function (c) {
+        return c.name === 'executionMode';
+      });
+      $scope.executionMode = executionModeConfig.value;
+
+      $scope.sources = _.filter($scope.stageLibraries, function (stageLibrary) {
+        return stageLibrary.type === pipelineConstant.SOURCE_STAGE_TYPE &&
+          stageLibrary.library !== 'streamsets-datacollector-stats-lib' &&
+          stageLibrary.executionModes.indexOf($scope.executionMode) !== -1;
+      });
+
+      $scope.processors = _.filter($scope.stageLibraries, function (stageLibrary) {
+        return stageLibrary.type === pipelineConstant.PROCESSOR_STAGE_TYPE &&
+          stageLibrary.library !== 'streamsets-datacollector-stats-lib' &&
+          stageLibrary.executionModes.indexOf($scope.executionMode) !== -1;
+      });
+
+      $scope.executors = _.filter($scope.stageLibraries, function (stageLibrary) {
+        return (stageLibrary.type === pipelineConstant.EXECUTOR_STAGE_TYPE &&
+          stageLibrary.library !== 'streamsets-datacollector-stats-lib') &&
+          stageLibrary.executionModes.indexOf($scope.executionMode) !== -1;
+      });
+
+      $scope.targets = _.filter($scope.stageLibraries, function (stageLibrary) {
+        return (stageLibrary.type === pipelineConstant.TARGET_STAGE_TYPE &&
+          !stageLibrary.errorStage && !stageLibrary.statsAggregatorStage  &&
+          stageLibrary.library !== 'streamsets-datacollector-stats-lib') &&
+          stageLibrary.executionModes.indexOf($scope.executionMode) !== -1;
+      });
 
       //Initialize the pipeline config
       if (!$scope.pipelineConfig.uiInfo || _.isEmpty($scope.pipelineConfig.uiInfo)) {
@@ -1173,8 +1181,10 @@ angular
         var statsAggregatorStageConfig = _.find($scope.pipelineConfig.configuration, function (c) {
           return c.name === 'statsAggregatorStage';
         });
-        statsAggregatorStageConfig.value = "streamsets-datacollector-basic-lib::" +
-          "com_streamsets_pipeline_stage_destination_devnull_StatsDpmDirectlyDTarget::1";
+        if (statsAggregatorStage) {
+          statsAggregatorStageConfig.value = "streamsets-datacollector-basic-lib::" +
+            "com_streamsets_pipeline_stage_destination_devnull_StatsNullDTarget::1";
+        }
       }
 
       //Determine edges from input lanes and output lanes
@@ -1376,7 +1386,7 @@ angular
       if (!$scope.previewMode && !$scope.snapshotMode && $scope.selectedType === type && $scope.selectedObject && selectedObject && optionsLength <= 2 &&
         ((type === pipelineConstant.PIPELINE && $scope.selectedObject.info.pipelineId === selectedObject.info.pipelineId) ||
           (type === pipelineConstant.STAGE_INSTANCE && $scope.selectedObject.instanceName === selectedObject.instanceName))) {
-        //Previous selection remain same
+        // Previous selection remain same
         return;
       }
 
@@ -1419,6 +1429,15 @@ angular
           }
         });
 
+        // Crate list of services where each item have both the definition and actual configuration values
+        $scope.detailPaneServices = [];
+        _.each($scope.detailPaneConfig.services, function(serviceConfig) {
+          var service = {};
+          service.definition = pipelineService.getServiceDefinition(serviceConfig.service);
+          service.config = serviceConfig;
+          $scope.detailPaneServices.push(service);
+        });
+
         $scope.stageLibraryList = _.sortBy(stageLibraryList, 'libraryLabel');
 
         if (!options.detailTabName) {
@@ -1438,7 +1457,7 @@ angular
         }
 
       } else if (type === pipelineConstant.PIPELINE){
-        //Pipeline Configuration
+        // Pipeline Configuration
         $scope.stageSelected = false;
         $scope.detailPaneConfigDefn = $scope.pipelineConfigDefinition;
         $scope.detailPaneConfig = $scope.selectedObject = $scope.pipelineConfig;
@@ -1677,7 +1696,7 @@ angular
       var pipelineStatus = $rootScope.common.pipelineStatusMap[routeParamPipelineName],
         config = $scope.pipelineConfig;
       return (pipelineStatus && config && pipelineStatus.pipelineId === config.info.pipelineId &&
-      _.contains(['RUNNING', 'STARTING', 'CONNECT_ERROR', 'RETRY', 'STOPPING'], pipelineStatus.status));
+      _.contains(['STARTING', 'STARTING_ERROR', 'RUNNING', 'RUNNING_ERROR', 'RETRY', 'FINISHING', 'STOPPING', 'STOPPING_ERROR', 'CONNECTING', 'CONNECT_ERROR'], pipelineStatus.status));
     };
 
     /**
@@ -1814,8 +1833,8 @@ angular
 
           if (badRecordsStage) {
             var configuration;
-            if (errorStageInst && errorStageInst.stageName == badRecordsStage.name  &&
-              errorStageInst.stageVersion == badRecordsStage.version) {
+            if (errorStageInst && errorStageInst.stageName === badRecordsStage.name  &&
+              errorStageInst.stageVersion === badRecordsStage.version) {
               configuration = errorStageInst.configuration;
             }
             newValue.errorStage = pipelineService.getNewStageInstance({
@@ -1848,9 +1867,8 @@ angular
           });
 
           if (statsAggregatorStage) {
-            var saConfig;
-            if (statsAggregatorStageInst && statsAggregatorStageInst.stageName == statsAggregatorStage.name  &&
-              statsAggregatorStageInst.stageVersion == statsAggregatorStage.version) {
+            if (statsAggregatorStageInst && statsAggregatorStageInst.stageName === statsAggregatorStage.name  &&
+              statsAggregatorStageInst.stageVersion === statsAggregatorStage.version) {
               saConfig = statsAggregatorStageInst.configuration;
             }
             newValue.statsAggregatorStage = pipelineService.getNewStageInstance({
@@ -1882,9 +1900,8 @@ angular
           });
 
           if (startEventStage) {
-            var saConfig;
-            if (startEventStageInst && startEventStageInst.stageName == startEventStage.name  &&
-              startEventStageInst.stageVersion == startEventStage.version) {
+            if (startEventStageInst && startEventStageInst.stageName === startEventStage.name  &&
+              startEventStageInst.stageVersion === startEventStage.version) {
               saConfig = startEventStageInst.configuration;
             }
             eventStage = pipelineService.getNewStageInstance({
@@ -1919,8 +1936,8 @@ angular
 
           if (stopEventStage) {
             var saConfig;
-            if (stopEventStageInst && stopEventStageInst.stageName == stopEventStage.name  &&
-              stopEventStageInst.stageVersion == stopEventStage.version) {
+            if (stopEventStageInst && stopEventStageInst.stageName === stopEventStage.name  &&
+              stopEventStageInst.stageVersion === stopEventStage.version) {
               saConfig = stopEventStageInst.configuration;
             }
             eventStage = pipelineService.getNewStageInstance({
@@ -1986,7 +2003,9 @@ angular
     });
 
     $scope.$on('onOriginStageDelete', function () {
-      api.pipelineAgent.resetOffset($scope.activeConfigInfo.pipelineId);
+      if ($scope.executionMode !== 'EDGE') {
+        api.pipelineAgent.resetOffset($scope.activeConfigInfo.pipelineId);
+      }
     });
 
     $scope.$on('onPipelineConfigSelect', function(event, configInfo) {

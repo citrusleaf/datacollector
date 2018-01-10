@@ -49,6 +49,8 @@ import com.streamsets.datacollector.execution.snapshot.file.FileSnapshotStore;
 import com.streamsets.datacollector.execution.store.CachePipelineStateStore;
 import com.streamsets.datacollector.execution.store.FilePipelineStateStore;
 import com.streamsets.datacollector.lineage.LineagePublisherTask;
+import com.streamsets.datacollector.main.BuildInfo;
+import com.streamsets.datacollector.main.DataCollectorBuildInfo;
 import com.streamsets.datacollector.main.RuntimeInfo;
 import com.streamsets.datacollector.main.RuntimeModule;
 import com.streamsets.datacollector.main.StandaloneRuntimeInfo;
@@ -328,7 +330,7 @@ public class TestUtil {
         //The if check is needed because the tests restart the pipeline manager. In that case the check prevents
         //us from trying to create the same pipeline again
         if(!pipelineStoreTask.hasPipeline("invalid")) {
-          pipelineStoreTask.create(USER, "invalid", "label" ,"invalid its empty", false);
+          pipelineStoreTask.create(USER, "invalid", "label" ,"invalid its empty", false, false);
           PipelineConfiguration pipelineConf = pipelineStoreTask.load("invalid", PIPELINE_REV);
           PipelineConfiguration mockPipelineConf = MockStages.createPipelineConfigurationSourceTarget();
           pipelineConf.setErrorStage(mockPipelineConf.getErrorStage());
@@ -337,7 +339,7 @@ public class TestUtil {
         }
 
         if (!pipelineStoreTask.hasPipeline(MY_PIPELINE)) {
-          pipelineStoreTask.create(USER, MY_PIPELINE, "label" ,"description", false);
+          pipelineStoreTask.create(USER, MY_PIPELINE, "label" ,"description", false, false);
           PipelineConfiguration pipelineConf = pipelineStoreTask.load(MY_PIPELINE, ZERO_REV);
           PipelineConfiguration mockPipelineConf = MockStages.createPipelineConfigurationSourceTarget();
           pipelineConf.setStages(mockPipelineConf.getStages());
@@ -365,11 +367,11 @@ public class TestUtil {
                 UUID.randomUUID(),
                 Collections.emptyList()
             );
-          pipelineStoreTask.storeRules(MY_PIPELINE, ZERO_REV, ruleDefinitions);
+          pipelineStoreTask.storeRules(MY_PIPELINE, ZERO_REV, ruleDefinitions, false);
         }
 
         if(!pipelineStoreTask.hasPipeline(MY_SECOND_PIPELINE)) {
-          pipelineStoreTask.create("user2", MY_SECOND_PIPELINE, "label" ,"description2", false);
+          pipelineStoreTask.create("user2", MY_SECOND_PIPELINE, "label" ,"description2", false, false);
           PipelineConfiguration pipelineConf = pipelineStoreTask.load(MY_SECOND_PIPELINE, ZERO_REV);
           PipelineConfiguration mockPipelineConf = MockStages.createPipelineConfigurationSourceProcessorTarget();
           pipelineConf.setStages(mockPipelineConf.getStages());
@@ -383,7 +385,7 @@ public class TestUtil {
 
         if(!pipelineStoreTask.hasPipeline(HIGHER_VERSION_PIPELINE)) {
           PipelineConfiguration pipelineConfiguration = pipelineStoreTask.create("user2", HIGHER_VERSION_PIPELINE,
-              "label" ,"description2", false);
+              "label" ,"description2", false, false);
           PipelineConfiguration mockPipelineConf = MockStages.createPipelineConfigurationSourceProcessorTargetHigherVersion();
           mockPipelineConf.getConfiguration().add(new Config("executionMode",
             ExecutionMode.STANDALONE.name()));
@@ -393,7 +395,7 @@ public class TestUtil {
         }
 
         if(!pipelineStoreTask.hasPipeline(PIPELINE_WITH_EMAIL)) {
-          pipelineStoreTask.create("user2", PIPELINE_WITH_EMAIL, "label" ,"description2", false);
+          pipelineStoreTask.create("user2", PIPELINE_WITH_EMAIL, "label" ,"description2", false, false);
           PipelineConfiguration pipelineConf = pipelineStoreTask.load(PIPELINE_WITH_EMAIL, ZERO_REV);
           PipelineConfiguration mockPipelineConf = MockStages.createPipelineConfigurationSourceProcessorTarget();
           pipelineConf.setStages(mockPipelineConf.getStages());
@@ -487,6 +489,11 @@ public class TestUtil {
     }
 
     @Provides @Singleton
+    public BuildInfo provideBuildInfo() {
+      return new DataCollectorBuildInfo();
+    }
+
+    @Provides @Singleton
     public RuntimeInfo provideRuntimeInfo() {
       RuntimeInfo info = new StandaloneRuntimeInfo(RuntimeModule.SDC_PROPERTY_PREFIX, new MetricRegistry(),
         Arrays.asList(getClass().getClassLoader()));
@@ -526,7 +533,11 @@ public class TestUtil {
     @Provides @Named("managerExecutor") @Singleton
     public SafeScheduledExecutorService provideManagerExecutor() {
       return new SafeScheduledExecutorService(10, "manager");
+    }
 
+    @Provides @Named("supportBundleExecutor") @Singleton
+    public SafeScheduledExecutorService providSupportBundleExecutor() {
+      return new SafeScheduledExecutorService(1, "supportBundleExecutor");
     }
   }
 
@@ -551,7 +562,8 @@ public class TestUtil {
       TestRuntimeModule.class,
       TestPipelineStoreModuleNew.class,
       TestSnapshotStoreModule.class,
-      TestLineageModule.class
+      TestLineageModule.class,
+      TestExecutorModule.class
     })
   public static class TestPipelineProviderModule {
 
@@ -642,7 +654,7 @@ public class TestUtil {
                                                                     MetricRegistry metrics, SnapshotStore snapshotStore,
                                                                     ThreadHealthReporter threadHealthReporter,
                                                                     SourceOffsetTracker sourceOffsetTracker) {
-      return new com.streamsets.datacollector.execution.runner.common.ProductionPipelineRunner(name, rev, configuration, runtimeInfo, metrics, snapshotStore,
+      return new com.streamsets.datacollector.execution.runner.common.ProductionPipelineRunner(name, rev, null, configuration, runtimeInfo, metrics, snapshotStore,
         threadHealthReporter);
     }
 

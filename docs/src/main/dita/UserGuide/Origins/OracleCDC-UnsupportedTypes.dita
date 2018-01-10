@@ -14,11 +14,11 @@
 -->
 <!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
 <concept id="concept_gwp_d4n_n1b">
- <title>Unsupported Data Types</title>
- <conbody>
-  <p><indexterm>Oracle CDC Client origin<indexterm>unsupported data types</indexterm></indexterm>You
-            can configure how the origin handles records that contain unsupported data types. The
-            origin can perform the following actions: </p>
+    <title>Unsupported Data Types</title>
+    <conbody>
+        <p><indexterm>Oracle CDC Client origin<indexterm>unsupported data
+                types</indexterm></indexterm>You can configure how the origin handles records that
+            contain unsupported data types. The origin can perform the following actions: </p>
         <p>
             <ul id="ul_onj_54n_n1b">
                 <li>Pass the record to the pipeline without the unsupported data types.</li>
@@ -26,7 +26,10 @@
                 <li>Discard the record.</li>
             </ul>
         </p>
-        <p>The following data types are not supported by the Oracle CDC Client origin:<ul
+        <p>You can configure the origin to include the unsupported data types in the record. When
+            you include unsupported types, the origin includes the field names and passes the data
+            as unparsed strings. </p>
+        <p>The following Oracle data types are not supported by the Oracle CDC Client origin:<ul
                 id="ul_mwq_g4n_n1b">
                 <li>Array</li>
                 <li>Blob</li>
@@ -39,9 +42,8 @@
                 <li>Ref</li>
                 <li>Ref Cursor</li>
                 <li>SQLXML</li>
-                <li>Struck</li>
-                <li>Timestamp with Timezone</li>
+                <li>Struct</li>
                 <li>Time with Timezone</li>
             </ul></p>
- </conbody>
+    </conbody>
 </concept>

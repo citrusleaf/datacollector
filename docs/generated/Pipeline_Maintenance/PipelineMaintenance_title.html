@@ -185,15 +185,18 @@
 <div class="topic task nested1" id="task_wpy_1xr_5q">
     <h2 class="title topictitle2">Starting Pipelines</h2>
 
-    
-    <div class="body taskbody"><p class="shortdesc">You can start pipelines when they are valid. When you start a pipeline, <span class="ph">Data
-                  Collector</span> runs
-        the pipeline until you stop the pipeline or shut down <span class="ph">Data
+    <div class="body taskbody">
+        <div class="section context">
+            <p class="p">You can start <span class="ph">Data
+                  Collector</span> pipelines when they are valid. When you start a pipeline, <span class="ph">Data
+                  Collector</span> runs the pipeline until you stop the pipeline or shut down <span class="ph">Data
                   Collector</span>.</p>
 
-        <div class="section context">
-            <p class="p">For most origins, when
-                you restart a pipeline, <span class="ph">Data
+            <div class="note note"><span class="notetitle">Note:</span> You cannot use <span class="ph">Data
+                  Collector</span> to start edge pipelines. Edge pipelines run on <span class="ph">Data Collector Edge</span>
+                    (<span class="ph">SDC Edge</span>). For more information about starting edge pipelines, see <a class="xref" href="../Edge_Mode/EdgePipelines_title.html#concept_rk3_2hm_pbb">Manage Pipelines on SDC Edge</a>.</div>
+
+            <p class="p">For most origins, when you restart a pipeline, <span class="ph">Data
                   Collector</span> starts the pipeline from where it last stopped by default. You can reset the
                 origin to read all available data.</p>
 
@@ -233,7 +236,7 @@
 
             </div>
 
-            <p class="p">For more information, see <a class="xref" href="../Pipeline_Configuration/PipelineConfiguration_title.html#concept_rjh_ntz_qr" title="Runtime parameters are parameters that you define in a pipeline and then call from within that same pipeline. When you start the pipeline, you specify the parameter values to use. Use runtime parameters to specify values for pipeline properties when you start the pipeline.">Using Runtime Parameters</a>.</p>
+            <p class="p">For more information, see <a class="xref" href="../Pipeline_Configuration/RuntimeValues.html#concept_rjh_ntz_qr" title="Runtime parameters are parameters that you define in a pipeline and then call from within that same pipeline. When you start the pipeline, you specify the parameter values to use. Use runtime parameters to specify values for pipeline properties when you start the pipeline.">Using Runtime Parameters</a>.</p>
 
         </div>
 
@@ -278,6 +281,8 @@
 
                 <li class="li">File Tail</li>
 
+                <li class="li">Google Cloud Storage</li>
+
                 <li class="li">JDBC Multitable Consumer</li>
 
                 <li class="li">JDBC Query Consumer</li>
@@ -300,14 +305,17 @@
 
                 <li class="li">SQL Server Change Tracking</li>
 
+                <li class="li">Windows Event Log</li>
+
             </ul>
 <p class="p">For these origins, when you stop the pipeline, the <span class="ph">Data
                   Collector</span> notes where it stopped processing data. When you restart the pipeline, it
                 continues from where it left off by default. When you want the <span class="ph">Data
                   Collector</span> to process all available data instead of continuing from where it stopped, reset
                 the origin.</p>
-<p class="p">To change the starting point for a Kafka Consumer, update the
-                offset in the Kafka ZooKeeper. For details, see the Kafka documentation. The
+<p class="p">You can configure the Kafka and MapR Streams origins to process
+                all available data by specifying  an additional Kafka configuration property. For
+                more information, see "Processing All Unread Data" in the stage documentation. The
                 remaining origin stages process transient data where resetting the origin has no
                 effect.</p>
 <p class="p">You can reset the origin for multiple pipelines at the same time from
@@ -480,9 +488,9 @@
      
      <thead class="thead" align="left">
       <tr>
-       <th class="entry" valign="top" width="30%" id="d367872e865">Permission</th>
+       <th class="entry" valign="top" width="30%" id="d419298e884">Permission</th>
 
-       <th class="entry" valign="top" width="70%" id="d367872e868">Description</th>
+       <th class="entry" valign="top" width="70%" id="d419298e887">Description</th>
 
       </tr>
 
@@ -490,23 +498,24 @@
 
      <tbody class="tbody">
       <tr>
-       <td class="entry" valign="top" width="30%" headers="d367872e865 ">Read</td>
+       <td class="entry" valign="top" width="30%" headers="d419298e884 ">Read</td>
 
-       <td class="entry" valign="top" width="70%" headers="d367872e868 ">View and monitor the pipeline, and see alerts. View existing snapshot data.</td>
-
-      </tr>
-
-      <tr>
-       <td class="entry" valign="top" width="30%" headers="d367872e865 ">Write</td>
-
-       <td class="entry" valign="top" width="70%" headers="d367872e868 ">Edit the pipeline and alerts.</td>
+       <td class="entry" valign="top" width="70%" headers="d419298e887 ">View <span class="ph">and monitor </span>the pipeline, and see alerts. <span class="ph">View existing snapshot data.</span></td>
 
       </tr>
 
       <tr>
-       <td class="entry" valign="top" width="30%" headers="d367872e865 ">Execute</td>
+       <td class="entry" valign="top" width="30%" headers="d419298e884 ">Write</td>
 
-       <td class="entry" valign="top" width="70%" headers="d367872e868 ">Start and stop the pipeline. Preview data and take a snapshot.</td>
+       <td class="entry" valign="top" width="70%" headers="d419298e887 ">Edit the pipeline and alerts.</td>
+
+      </tr>
+
+      <tr>
+       <td class="entry" valign="top" width="30%" headers="d419298e884 ">Execute</td>
+
+       <td class="entry" valign="top" width="70%" headers="d419298e887 ">Start and stop the pipeline. Preview data<span class="ph"> and take a
+        snapshot</span>.</td>
 
       </tr>
 
@@ -662,7 +671,7 @@ For example, you
                   Collector</span>
                 saves the files to your default downloads directory.</p>
 
-            <p class="p">To export pipelines for use in <span class="ph">Dataflow Performance Manager</span> (<span class="ph">DPM</span>), see <a class="xref" href="../DPM/PipelineManagement.html#task_emc_p42_fx" title="If you develop pipelines in a Data Collector that is not registered with DPM, you can export the pipelines and then import the pipelines into DPM. When a Data Collector is registered with DPM, it's simplest to publish the pipelines directly to DPM.">Exporting Pipelines for DPM</a>.</p>
+            <p class="p">To export pipelines for use in <span class="ph">StreamSets Control Hub</span>, see <a class="xref" href="../DPM/PipelineManagement.html#task_emc_p42_fx" title="If you develop pipelines in a Data Collector that is not registered with Control Hub, you can export the pipelines and then import the pipelines into Control Hub. When a Data Collector is registered with Control Hub, it's simplest to publish the pipelines directly to Control Hub.">Exporting Pipelines for Control Hub</a>.</p>
 
         </div>
 

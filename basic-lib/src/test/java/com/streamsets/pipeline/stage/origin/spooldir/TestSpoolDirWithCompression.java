@@ -17,7 +17,6 @@ package com.streamsets.pipeline.stage.origin.spooldir;
 
 import com.google.common.io.Resources;
 import com.streamsets.pipeline.api.Record;
-import com.streamsets.pipeline.api.Source;
 import com.streamsets.pipeline.config.Compression;
 import com.streamsets.pipeline.config.DataFormat;
 import com.streamsets.pipeline.config.OnParseError;
@@ -108,7 +107,8 @@ public class TestSpoolDirWithCompression {
       runner.waitOnProduce();
       Assert.assertNotNull(runner.getOffsets());
       Assert.assertEquals(37044, records.size());
-      Assert.assertEquals("logArchive2.zip::-1", runner.getOffsets().get(Source.POLL_SOURCE_OFFSET_KEY));
+
+      TestOffsetUtil.compare("logArchive2.zip::-1", runner.getOffsets());
     } finally {
       runner.runDestroy();
     }
@@ -138,7 +138,7 @@ public class TestSpoolDirWithCompression {
 
       Assert.assertNotNull(runner.getOffsets());
       Assert.assertEquals(37044, records.size());
-      Assert.assertEquals("logArchive2.tar.gz::-1", runner.getOffsets().get(Source.POLL_SOURCE_OFFSET_KEY));
+      TestOffsetUtil.compare("logArchive2.tar.gz::-1", runner.getOffsets());
     } finally {
       runner.runDestroy();
     }
@@ -168,7 +168,7 @@ public class TestSpoolDirWithCompression {
       Assert.assertNotNull(runner.getOffsets());
 
       Assert.assertEquals(48000, records.size());
-      Assert.assertEquals("testAvro2.tar.gz::-1", runner.getOffsets().get(Source.POLL_SOURCE_OFFSET_KEY));
+      TestOffsetUtil.compare("testAvro2.tar.gz::-1", runner.getOffsets());
     } finally {
       runner.runDestroy();
     }
@@ -198,7 +198,7 @@ public class TestSpoolDirWithCompression {
 
       Assert.assertNotNull(runner.getOffsets());
       Assert.assertEquals(4, records.size());
-      Assert.assertEquals("testFile2.bz2::-1", runner.getOffsets().get(Source.POLL_SOURCE_OFFSET_KEY));
+      TestOffsetUtil.compare("testFile2.bz2::-1", runner.getOffsets());
     } finally {
       runner.runDestroy();
     }

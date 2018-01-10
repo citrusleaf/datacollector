@@ -32,7 +32,7 @@ public enum ValidationError implements ErrorCode {
   VALIDATION_0005("Stage name already defined"),
   VALIDATION_0006("Stage definition does not exist, library '{}', name '{}', version '{}'"),
   VALIDATION_0007("Configuration value is required"),
-  VALIDATION_0008("Invalid configuration"),
+  VALIDATION_0008("Invalid configuration: '{}'"),
   VALIDATION_0009("Configuration should be a '{}'"),
   VALIDATION_0010("Output streams '{}' are already defined by stage '{}'"),
   VALIDATION_0011("Stage has open output streams"),
@@ -95,7 +95,6 @@ public enum ValidationError implements ErrorCode {
   VALIDATION_0071("Stage '{}' from '{}' library does not support '{}' execution mode"),
   VALIDATION_0072("Data collector is in standalone mode, cannot run pipeline cluster mode"),
   VALIDATION_0073("Data collector is in cluster mode, cannot run pipeline standalone mode"),
-  VALIDATION_0074("Error Stage '{}' from '{}' library does not support '{}' execution mode"),
   VALIDATION_0080("Precondition '{}' must begin with '${' and end with '}'"),
   VALIDATION_0081("Invalid precondition '{}': {}"),
   VALIDATION_0082("Cannot create runner with execution mode '{}', another runner with execution mode '{}'"
@@ -113,6 +112,9 @@ public enum ValidationError implements ErrorCode {
   VALIDATION_0104("Stage has open event streams"),
   VALIDATION_0105("Invalid pipeline lifecycle specification: {}"),
   VALIDATION_0106("Pipeline lifecycle events are not supported in mode: {}"),
+
+  // Service related validations
+  VALIDATION_0200("Invalid services declaration, expected definition for '{}', but got '{}'"),
   ;
 
   private final String msg;

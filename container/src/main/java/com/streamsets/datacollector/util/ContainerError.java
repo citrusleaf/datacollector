@@ -144,7 +144,9 @@ public enum ContainerError implements ErrorCode {
   //PipelineConfigurationUpgrader
   CONTAINER_0900("Error while upgrading stage configuration from version '{}' to version '{}': {}"),
   CONTAINER_0901("Could not find stage definition for '{}:{}'"),
-  CONTAINER_0902("Stage definition '{}:{}' version '{}' is older than the version specified in the configuration '{}' for stage '{}'"),
+  CONTAINER_0902("Definition requires at least version {} which is higher then available library supports ({})"),
+  CONTAINER_0903("Could not find service definition for '{}'"),
+  CONTAINER_0904("Service Upgrader can't register another service."),
 
   //Email Notifier
   CONTAINER_01000("Error loading email template, reason : {}"),
@@ -169,6 +171,10 @@ public enum ContainerError implements ErrorCode {
   CONTAINER_01404("Unknown LineageEventType passed to missingSpecificAttributes() '{}'"),
 
   CONTAINER_01500("Stage '{}' configuration '{}', EL must resolve to String or to a CredentialValue resolved to '{}'"),
+
+
+  CONTAINER_01600("Download executable not supported for pipeline execution mode: '{}'"),
+  CONTAINER_01601("Start operation is not supported for pipeline '{}' with execution mode: '{}'"),
   ;
 
   private final String msg;

@@ -26,7 +26,7 @@ import java.util.Map;
 
 public interface PipelineStoreTask extends Task {
   // Provide upgrade path in PipelineConfigurationUpgrader when increasing
-  public static final int SCHEMA_VERSION = 4;
+  public static final int SCHEMA_VERSION = 5;
   public static final int RULE_DEFINITIONS_SCHEMA_VERSION = 3;
 
   public PipelineConfiguration create(
@@ -34,7 +34,8 @@ public interface PipelineStoreTask extends Task {
       String pipelineId,
       String pipelineTitle,
       String description,
-      boolean isRemote
+      boolean isRemote,
+      boolean draft
   ) throws PipelineException;
 
   public void delete(String name) throws PipelineException;
@@ -54,7 +55,7 @@ public interface PipelineStoreTask extends Task {
 
   public RuleDefinitions retrieveRules(String name, String tagOrRev) throws PipelineException;
 
-  public RuleDefinitions storeRules(String pipelineName, String tag, RuleDefinitions ruleDefinitions)
+  public RuleDefinitions storeRules(String pipelineName, String tag, RuleDefinitions ruleDefinitions, boolean draft)
       throws PipelineException;
 
   public boolean deleteRules(String name) throws PipelineException;

@@ -23,13 +23,17 @@ import com.streamsets.pipeline.api.StageDef;
 import com.streamsets.pipeline.configurablestage.DPushSource;
 import com.streamsets.pipeline.lib.jdbc.HikariPoolConfigBean;
 import com.streamsets.pipeline.stage.origin.jdbc.CommonSourceConfigBean;
+import com.streamsets.pipeline.stage.origin.jdbc.table.QuoteChar;
+import com.streamsets.pipeline.stage.origin.jdbc.table.TableJdbcConfigBean;
 
 @StageDef(
-    version = 1,
+    version = 4,
     label = "SQL Server CDC Client",
     description = "Origin that an read change events from an MS SQL Server Database",
     icon = "sql-server-multithreaded.png",
     resetOffset = true,
+    producesEvents = true,
+    upgrader = SQLServerCDCSourceUpgrader.class,
     onlineHelpRefUrl = "index.html#Origins/SQLServerCDC.html#task_nsg_fxc_v1b"
 )
 @GenerateResourceBundle
@@ -47,7 +51,18 @@ public class SQLServerCDCDSource extends DPushSource {
 
   @Override
   protected PushSource createPushSource() {
-    return new SQLServerCDCSource(hikariConf, commonSourceConfigBean, cdcTableJdbcConfigBean);
+    return new SQLServerCDCSource(hikariConf, commonSourceConfigBean, cdcTableJdbcConfigBean, convertToTableJdbcConfigBean(cdcTableJdbcConfigBean));
+  }
+
+  private TableJdbcConfigBean convertToTableJdbcConfigBean(CDCTableJdbcConfigBean cdcTableJdbcConfigBean) {
+    TableJdbcConfigBean tableJdbcConfigBean = new TableJdbcConfigBean();
+    tableJdbcConfigBean.batchTableStrategy = cdcTableJdbcConfigBean.batchTableStrategy;
+    tableJdbcConfigBean.quoteChar = QuoteChar.NONE;
+    tableJdbcConfigBean.timeZoneID = "UTC";
+    tableJdbcConfigBean.numberOfThreads = cdcTableJdbcConfigBean.numberOfThreads;
+    tableJdbcConfigBean.tableOrderStrategy = cdcTableJdbcConfigBean.tableOrderStrategy;
+
+    return tableJdbcConfigBean;
   }
 
 }

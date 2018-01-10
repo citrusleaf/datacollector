@@ -23,6 +23,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
+import com.streamsets.datacollector.bundles.SupportBundleManager;
 import com.streamsets.datacollector.callback.CallbackInfo;
 import com.streamsets.datacollector.callback.CallbackObjectType;
 import com.streamsets.datacollector.cluster.ApplicationState;
@@ -121,6 +122,7 @@ public class ClusterRunner extends AbstractRunner {
   @Inject ResourceManager resourceManager;
   @Inject SlaveCallbackManager slaveCallbackManager;
   @Inject LineagePublisherTask lineagePublisherTask;
+  @Inject SupportBundleManager supportBundleManager;
 
   private final String name;
   private final String rev;
@@ -178,7 +180,7 @@ public class ClusterRunner extends AbstractRunner {
     this.rev = rev;
     this.tempDir = Files.createTempDir();
     if (clusterHelper == null) {
-      this.clusterHelper = new ClusterHelper(runtimeInfo, null, tempDir);
+      this.clusterHelper = new ClusterHelper(runtimeInfo, null, tempDir, configuration);
     } else {
       this.clusterHelper = clusterHelper;
     }
@@ -201,7 +203,7 @@ public class ClusterRunner extends AbstractRunner {
       throw new IllegalStateException(Utils.format("Could not create temp directory: {}", tempDir));
     }
     this.clusterHelper = new ClusterHelper(runtimeInfo, new SecurityConfiguration(runtimeInfo,
-      configuration), tempDir);
+      configuration), tempDir, configuration);
     if (configuration.get(MetricsEventRunnable.REFRESH_INTERVAL_PROPERTY,
       MetricsEventRunnable.REFRESH_INTERVAL_PROPERTY_DEFAULT) > 0) {
       metricsEventRunnable = this.objectGraph.get(MetricsEventRunnable.class);
@@ -707,9 +709,16 @@ public class ClusterRunner extends AbstractRunner {
   private ProductionPipeline createProductionPipeline(String user, String name, String rev, Configuration configuration,
     PipelineConfiguration pipelineConfiguration) throws PipelineStoreException, PipelineRuntimeException,
     StageException {
-    ProductionPipelineRunner runner =
-      new ProductionPipelineRunner(name, rev, configuration, runtimeInfo, new MetricRegistry(),
-        null, null);
+    ProductionPipelineRunner runner = new ProductionPipelineRunner(
+      name,
+      rev,
+      supportBundleManager,
+      configuration,
+      runtimeInfo,
+      new MetricRegistry(),
+      null,
+      null
+    );
     if (rateLimit > 0) {
       runner.setRateLimit(rateLimit);
     }
